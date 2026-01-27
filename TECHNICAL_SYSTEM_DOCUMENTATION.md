@@ -15,7 +15,7 @@ Provide a Review-01 level “Smart Crop Advisory” demo system with:
 - English + Punjabi UI
 
 ### Target users
-Small and marginal farmers; low digital literacy considered (see `REVIEW01_SCOPE.md`).
+Small and marginal farmers; low digital literacy considered (see `REVIEW_1_SCOPE.md`).
 
 ### Real-world relevance
 The project demonstrates how farm advisory workflows can be built using a web UI, a backend API, and external data sources (weather), with a placeholder for ML-based disease inference.
@@ -90,7 +90,7 @@ Routes (from `frontend/src/App.jsx`):
    - Basic 404 message.
 
 ### User flow (implemented)
-Typical demo flow (matches `REVIEW01_SCOPE.md`):
+Typical demo flow (matches `REVIEW_1_SCOPE.md`):
 1) Create farmer profile → 2) Enter soil test → 3) Get crop recommendation → 4) Get fertilizer guidance → optionally check weather and disease scan.
 
 ## 4. Backend Details
@@ -362,3 +362,121 @@ Dummy/deterministic: always returns the same disease response.
 - Replace stubbed prediction with a real model.
 - Add support for multiple crops/diseases.
 
+---
+
+## Appendix A: Architecture Lock & Component Responsibilities (Review-01)
+_Source merged from former `ARCHITECTURE_LOCK.md`._
+
+### A1) High-level architecture (locked)
+The system is split into 5 parts:
+1. **Frontend Web App (React)**
+2. **Backend API / Orchestrator (Node.js + Express)**
+3. **ML Inference Service (Python: FastAPI or Flask)**
+4. **Database (MongoDB)**
+5. **External Weather Provider (Public Weather API)**
+
+This separation is intentional so that ML, weather, and UI can evolve independently.
+
+### A2) Component responsibilities (what each part owns)
+
+#### Frontend Web App (React)
+**Owns**
+- User experience and navigation (simple, mobile-friendly flows)
+- Data entry forms: farmer profile, soil parameters, image upload
+- Display of results: crop recommendations, fertilizer plan, disease result + treatment, weather dashboard
+- Language toggle (English / Punjabi Gurmukhi)
+
+**Does NOT own**
+- Business rules (crop/fertilizer logic)
+- ML inference logic
+- Direct database access
+
+#### Backend API / Orchestrator (Node.js + Express)
+**Owns**
+- Input validation and consistent error handling
+- Orchestration of features (connect UI to DB, ML service, and weather)
+- Business logic (v1): crop recommendation (rule-based), fertilizer guidance (rule-based)
+- Persistence operations (via MongoDB)
+- Mapping predicted disease → treatment recommendation text
+- Weather normalization (convert external weather response into app-friendly output)
+
+**Does NOT own**
+- ML model internals (kept inside the Python service)
+- UI rendering decisions
+
+#### ML Inference Service (Python)
+**Owns**
+- Image preprocessing (as required by the model)
+- Disease inference (either stub for Review-01 stability or real pre-trained model)
+- Returning structured prediction results (disease label + confidence)
+
+**Does NOT own**
+- Treatment text content and multilingual phrasing
+- Storage of farmer profiles/history
+
+#### Database (MongoDB)
+**Owns**
+- Persistent storage for core records (profiles, soil tests) and optional future records (advisory history, disease scan history, weather cache)
+
+**Does NOT own**
+- Business rules
+- ML computation
+
+#### External Weather Provider (Public API)
+**Owns**
+- Supplying raw weather forecast data
+
+### A3) Non-functional expectations (Review-01)
+- Reliability over completeness
+- Explainability (rule-based)
+- Usability (minimal steps, bilingual)
+- Local demo readiness
+
+### A4) Explicit boundaries (avoid scope creep)
+- No on-device/offline ML requirement for Review-01
+- No training a model from scratch
+- No SMS/WhatsApp alerts
+- No free-form chatbot (guided/template only)
+
+---
+
+## Appendix B: UI Data Contracts (Frontend-only) — Review-01
+_Source merged from former `UI_DATA_CONTRACTS.md`._
+
+### B0) Global UI rules
+- Keep forms minimal and farmer-friendly.
+- Provide clear labels and helper text.
+- Validate inputs on the client for obvious errors.
+- Support bilingual display (English + Punjabi Gurmukhi).
+- Show safe error messages (no technical stack traces).
+
+### B1) Dashboard Screen
+**Shows** quick entry points to Profile, Soil, Crop, Fertilizer, Disease, Weather, plus placeholders for recent activity.
+
+### B2) Farmer Profile Screen
+**Inputs:** name (optional), location (required), soil type (optional), previous crop (optional), season (optional/recommended).
+**Validation:** location required.
+
+### B3) Soil Input Screen (NPK / pH)
+**Inputs:** N, P, K, pH (required), test date (optional).
+**Validation:** N/P/K non-negative; pH within 0–14.
+
+### B4) Crop Recommendation Screen
+**Requires:** location + soil values.
+**Outputs:** ranked recommendations with reasons and warnings; missing-input notice.
+
+### B5) Fertilizer Guidance Screen
+**Requires:** soil values.
+**Recommended:** selected crop.
+**Outputs:** NPK guidance, schedule, safety notes; missing-input notice.
+
+### B6) Disease Detection Screen
+**Inputs:** crop type (optional), leaf image (required).
+**Outputs:** disease name, confidence, treatment recommendation, escalation/safety note; history later.
+
+### B7) Weather Screen
+**Requires:** location.
+**Outputs:** 7-day forecast and alerts area (rule-based).
+
+### B8) Language Toggle
+Switch English (en) / Punjabi (pa) for labels and outputs; fallback to English if missing.
