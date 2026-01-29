@@ -1,6 +1,7 @@
 import { useI18n } from "../i18n/I18nContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { apiRequest } from "../api/client";
+import { NavLink } from "react-router-dom";
 
 function WxIcon({ rainProb }) {
   const p = Number(rainProb);
@@ -54,19 +55,74 @@ function WxIcon({ rainProb }) {
 export default function WeatherPage() {
   const { t } = useI18n();
 
-  const [lat, setLat] = useState("30.9010");
-  const [lon, setLon] = useState("75.8573");
+  const [profile, setProfile] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [profileError, setProfileError] = useState(null);
+
+  const [locations, setLocations] = useState([]);
+  const [loadingLocations, setLoadingLocations] = useState(true);
+  const [locationsError, setLocationsError] = useState(null);
+  const [overrideLocationId, setOverrideLocationId] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  useEffect(() => {
+    let alive = true;
+    setLoadingProfile(true);
+    setProfileError(null);
+    apiRequest("/me/profile")
+      .then((p) => {
+        if (!alive) return;
+        setProfile(p);
+      })
+      .catch((e) => {
+        if (!alive) return;
+        setProfileError(e);
+      })
+      .finally(() => {
+        if (!alive) return;
+        setLoadingProfile(false);
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    setLoadingLocations(true);
+    setLocationsError(null);
+    apiRequest("/locations")
+      .then((items) => {
+        if (!alive) return;
+        setLocations(Array.isArray(items) ? items : []);
+      })
+      .catch((e) => {
+        if (!alive) return;
+        setLocationsError(e);
+      })
+      .finally(() => {
+        if (!alive) return;
+        setLoadingLocations(false);
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const fetchWeather = async () => {
+    if (!profile?._id) return;
     setLoading(true);
     setError(null);
     setResult(null);
     try {
-      const qs = new URLSearchParams({ lat, lon });
-      const data = await apiRequest(`/weather/forecast?${qs.toString()}`);
+      const qs = new URLSearchParams();
+      if (overrideLocationId) qs.set("locationId", overrideLocationId);
+      const data = await apiRequest(`/weather/forecast/by-profile?${qs.toString()}`);
       setResult(data);
     } catch (e) {
       setError(e);
@@ -75,22 +131,78 @@ export default function WeatherPage() {
     }
   };
 
+  const overrideLabel = () => {
+    if (!overrideLocationId) return null;
+    const x = locations.find((l) => l._id === overrideLocationId);
+    return x?.name?.en || x?.code || "-";
+  };
+
   return (
     <div>
       <h1>{t("pageWeatherTitle")}</h1>
       <p>{t("pageWeatherBody")}</p>
 
+      {profileError ? (
+        <div className="card">
+          <strong>{t("weatherErrorProfiles")}</strong>
+          <div className="muted">{String(profileError.message || profileError)}</div>
+        </div>
+      ) : null}
+
+      {!loadingProfile && !profile ? (
+        <div className="card">
+          <div className="muted">{t("weatherNoProfiles")}</div>
+          <div className="ctaRow" style={{ marginTop: 10 }}>
+            <NavLink className="ctaLink" to="/profile">
+              {t("commonGoToProfile")}
+            </NavLink>
+          </div>
+        </div>
+      ) : null}
+
+      {locationsError ? (
+        <div className="card">
+          <strong>{t("profileLocationLoadError")}</strong>
+          <div className="muted">{String(locationsError.message || locationsError)}</div>
+        </div>
+      ) : null}
+
       <div className="card">
         <div style={{ display: "grid", gap: 10 }}>
+          <div className="chips">
+            <span className="chip">
+              {t("weatherSelectProfile")}: {profile?.name || profile?.locationId?.name?.en || "-"}
+            </span>
+          </div>
+
           <label>
-            <div><strong>{t("weatherLat")}</strong></div>
-            <input value={lat} onChange={(e) => setLat(e.target.value)} />
+            <div><strong>{t("overrideLocationLabel")}</strong></div>
+            <select
+              value={overrideLocationId}
+              onChange={(e) => setOverrideLocationId(e.target.value)}
+              disabled={loadingLocations || locations.length === 0}
+            >
+              <option value="">{t("overrideLocationNone")}</option>
+              {locations.map((l) => (
+                <option key={l._id} value={l._id}>
+                  {l?.name?.en || l.code}
+                </option>
+              ))}
+            </select>
+            <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+              {t("overrideLocationHelp")}
+            </div>
           </label>
-          <label>
-            <div><strong>{t("weatherLon")}</strong></div>
-            <input value={lon} onChange={(e) => setLon(e.target.value)} />
-          </label>
-          <button className="btn" type="button" onClick={fetchWeather} disabled={loading}>
+
+          {overrideLocationId ? (
+            <div className="chips">
+              <span className="chip chipWarn">
+                {t("overrideActive")}: {overrideLabel()}
+              </span>
+            </div>
+          ) : null}
+
+          <button className="btn" type="button" onClick={fetchWeather} disabled={loading || !profile?._id}>
             {loading ? "..." : t("weatherFetch")}
           </button>
         </div>
@@ -108,6 +220,17 @@ export default function WeatherPage() {
 
       {result ? (
         <>
+          {result?.used?.locationName ? (
+            <div className="card">
+              <h2 className="sectionTitle">{t("weatherUsed")}</h2>
+              <div className="chips">
+                <span className="chip">{t("weatherDistrict")}: {result.used.locationName}</span>
+                <span className="chip">Lat: {result.used.lat ?? "-"}</span>
+                <span className="chip">Lon: {result.used.lon ?? "-"}</span>
+              </div>
+            </div>
+          ) : null}
+
           <div className="card">
             <h2 className="sectionTitle">{t("weatherAlerts")}</h2>
             {Array.isArray(result.alerts) && result.alerts.length > 0 ? (
@@ -145,7 +268,7 @@ export default function WeatherPage() {
                     <strong>{d.rainProbabilityMax ?? "-"}%</strong>
                   </div>
                   <div className="forecastRow">
-                    <span>mm</span>
+                    <span>{t("weatherCardRainMm")}</span>
                     <strong>{d.rainSumMm ?? "-"}</strong>
                   </div>
                 </div>

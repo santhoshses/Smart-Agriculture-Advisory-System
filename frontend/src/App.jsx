@@ -14,6 +14,14 @@ import SoilInputPage from "./pages/SoilInputPage";
 import AssistantPage from "./pages/AssistantPage";
 import WeatherPage from "./pages/WeatherPage";
 import ChatbotPage from "./pages/ChatbotPage";
+import LoginPage from "./pages/LoginPage";
+import { getAuthToken } from "./api/client";
+
+function RequireAuth({ children }) {
+  const token = getAuthToken();
+  if (!token) return <Navigate to="/login" replace />;
+  return children;
+}
 
 function useLanguageToggle() {
   const [language, setLanguage] = useState("en");
@@ -35,7 +43,15 @@ export default function App() {
   return (
     <I18nProvider language={language}>
       <Routes>
-        <Route element={<AppLayout language={language} onToggleLanguage={toggle} />}>
+        <Route path="/login" element={<LoginPage />} />
+
+        <Route
+          element={
+            <RequireAuth>
+              <AppLayout language={language} onToggleLanguage={toggle} />
+            </RequireAuth>
+          }
+        >
           <Route path="/" element={<DashboardPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/soil" element={<SoilInputPage />} />

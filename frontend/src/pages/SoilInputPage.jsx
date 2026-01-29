@@ -6,11 +6,9 @@ import { NavLink } from "react-router-dom";
 export default function SoilInputPage() {
   const { t } = useI18n();
 
-  const [profiles, setProfiles] = useState([]);
-  const [profilesError, setProfilesError] = useState(null);
-  const [loadingProfiles, setLoadingProfiles] = useState(true);
-
-  const [profileId, setProfileId] = useState("");
+  const [profile, setProfile] = useState(null);
+  const [profileError, setProfileError] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
   const [form, setForm] = useState({ n: "", p: "", k: "", ph: "" });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(null);
@@ -18,21 +16,20 @@ export default function SoilInputPage() {
 
   useEffect(() => {
     let alive = true;
-    setLoadingProfiles(true);
-    setProfilesError(null);
-    apiRequest("/profiles")
-      .then((items) => {
+    setLoadingProfile(true);
+    setProfileError(null);
+    apiRequest("/me/profile")
+      .then((p) => {
         if (!alive) return;
-        setProfiles(Array.isArray(items) ? items : []);
-        if (Array.isArray(items) && items.length > 0) setProfileId(items[0]._id);
+        setProfile(p);
       })
       .catch((e) => {
         if (!alive) return;
-        setProfilesError(e);
+        setProfileError(e);
       })
       .finally(() => {
         if (!alive) return;
-        setLoadingProfiles(false);
+        setLoadingProfile(false);
       });
     return () => {
       alive = false;
@@ -40,8 +37,8 @@ export default function SoilInputPage() {
   }, []);
 
   const canSubmit = useMemo(() => {
-    return Boolean(profileId) && form.n !== "" && form.p !== "" && form.k !== "" && form.ph !== "";
-  }, [profileId, form]);
+    return Boolean(profile?._id) && form.n !== "" && form.p !== "" && form.k !== "" && form.ph !== "";
+  }, [profile, form]);
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +52,6 @@ export default function SoilInputPage() {
     setSaving(true);
     try {
       const payload = {
-        profileId,
         n: Number(form.n),
         p: Number(form.p),
         k: Number(form.k),
@@ -75,31 +71,31 @@ export default function SoilInputPage() {
       <h1>{t("pageSoilTitle")}</h1>
       <p>{t("pageSoilBody")}</p>
 
-      {profilesError ? (
+      {profileError ? (
         <div className="card">
           <strong>{t("soilErrorLoadProfiles")}</strong>
-          <div className="muted">{String(profilesError.message || profilesError)}</div>
+          <div className="muted">{String(profileError.message || profileError)}</div>
         </div>
       ) : null}
 
-      {!loadingProfiles && profiles.length === 0 ? (
+      {!loadingProfile && !profile ? (
         <div className="card">
           <div className="muted">{t("soilNoProfiles")}</div>
+          <div className="ctaRow" style={{ marginTop: 10 }}>
+            <NavLink className="ctaLink" to="/profile">
+              {t("commonGoToProfile")}
+            </NavLink>
+          </div>
         </div>
       ) : null}
 
       <form className="card" onSubmit={onSubmit}>
         <div style={{ display: "grid", gap: 10 }}>
-          <label>
-            <div><strong>{t("soilSelectProfile")}</strong></div>
-            <select value={profileId} onChange={(e) => setProfileId(e.target.value)} disabled={loadingProfiles}>
-              {profiles.map((p) => (
-                <option key={p._id} value={p._id}>
-                  {p.location} ({p._id})
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="chips">
+            <span className="chip">
+              {t("soilSelectProfile")}: {profile?.name || profile?.locationId?.name?.en || "-"}
+            </span>
+          </div>
 
           <label>
             <div><strong>{t("soilN")}</strong></div>

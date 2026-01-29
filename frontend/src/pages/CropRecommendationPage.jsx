@@ -6,10 +6,14 @@ import { NavLink } from "react-router-dom";
 export default function CropRecommendationPage() {
   const { t } = useI18n();
 
-  const [profiles, setProfiles] = useState([]);
-  const [loadingProfiles, setLoadingProfiles] = useState(true);
-  const [profilesError, setProfilesError] = useState(null);
-  const [profileId, setProfileId] = useState("");
+  const [profile, setProfile] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [profileError, setProfileError] = useState(null);
+
+  const [locations, setLocations] = useState([]);
+  const [loadingLocations, setLoadingLocations] = useState(true);
+  const [locationsError, setLocationsError] = useState(null);
+  const [overrideLocationId, setOverrideLocationId] = useState("");
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -17,21 +21,43 @@ export default function CropRecommendationPage() {
 
   useEffect(() => {
     let alive = true;
-    setLoadingProfiles(true);
-    setProfilesError(null);
-    apiRequest("/profiles")
-      .then((items) => {
+    setLoadingProfile(true);
+    setProfileError(null);
+    apiRequest("/me/profile")
+      .then((p) => {
         if (!alive) return;
-        setProfiles(Array.isArray(items) ? items : []);
-        if (Array.isArray(items) && items.length > 0) setProfileId(items[0]._id);
+        setProfile(p);
       })
       .catch((e) => {
         if (!alive) return;
-        setProfilesError(e);
+        setProfileError(e);
       })
       .finally(() => {
         if (!alive) return;
-        setLoadingProfiles(false);
+        setLoadingProfile(false);
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    setLoadingLocations(true);
+    setLocationsError(null);
+    apiRequest("/locations")
+      .then((items) => {
+        if (!alive) return;
+        setLocations(Array.isArray(items) ? items : []);
+      })
+      .catch((e) => {
+        if (!alive) return;
+        setLocationsError(e);
+      })
+      .finally(() => {
+        if (!alive) return;
+        setLoadingLocations(false);
       });
 
     return () => {
@@ -40,18 +66,27 @@ export default function CropRecommendationPage() {
   }, []);
 
   const fetchRecommendations = async () => {
-    if (!profileId) return;
+    if (!profile?._id) return;
     setLoading(true);
     setError(null);
     setResult(null);
     try {
-      const data = await apiRequest(`/recommendations/crop?profileId=${encodeURIComponent(profileId)}`);
+      const qs = new URLSearchParams();
+      if (overrideLocationId) qs.set("locationId", overrideLocationId);
+      const data = await apiRequest(`/recommendations/crop?${qs.toString()}`);
       setResult(data);
     } catch (e) {
       setError(e);
     } finally {
       setLoading(false);
     }
+  };
+
+  const overrideLabel = () => {
+    if (!overrideLocationId) return null;
+    const x = locations.find((l) => l._id === overrideLocationId);
+    const nm = x?.name?.en || x?.code || "-";
+    return nm;
   };
 
   const renderWeatherSummary = () => {
@@ -140,33 +175,67 @@ export default function CropRecommendationPage() {
       <h1>{t("pageCropTitle")}</h1>
       <p>{t("pageCropBody")}</p>
 
-      {profilesError ? (
+      {profileError ? (
         <div className="card">
           <strong>{t("cropErrorProfiles")}</strong>
-          <div className="muted">{String(profilesError.message || profilesError)}</div>
+          <div className="muted">{String(profileError.message || profileError)}</div>
         </div>
       ) : null}
 
-      {!loadingProfiles && profiles.length === 0 ? (
+      {!loadingProfile && !profile ? (
         <div className="card">
           <div className="muted">{t("cropNoProfiles")}</div>
+          <div className="ctaRow" style={{ marginTop: 10 }}>
+            <NavLink className="ctaLink" to="/profile">
+              {t("commonGoToProfile")}
+            </NavLink>
+          </div>
+        </div>
+      ) : null}
+
+      {locationsError ? (
+        <div className="card">
+          <strong>{t("profileLocationLoadError")}</strong>
+          <div className="muted">{String(locationsError.message || locationsError)}</div>
         </div>
       ) : null}
 
       <div className="card">
         <div style={{ display: "grid", gap: 10 }}>
+          <div className="chips">
+            <span className="chip">
+              {t("cropSelectProfile")}: {profile?.name || profile?.locationId?.name?.en || "-"}
+            </span>
+          </div>
+
           <label>
-            <div><strong>{t("cropSelectProfile")}</strong></div>
-            <select value={profileId} onChange={(e) => setProfileId(e.target.value)} disabled={loadingProfiles}>
-              {profiles.map((p) => (
-                <option key={p._id} value={p._id}>
-                  {p.location} ({p._id})
+            <div><strong>{t("overrideLocationLabel")}</strong></div>
+            <select
+              value={overrideLocationId}
+              onChange={(e) => setOverrideLocationId(e.target.value)}
+              disabled={loadingLocations || locations.length === 0}
+            >
+              <option value="">{t("overrideLocationNone")}</option>
+              {locations.map((l) => (
+                <option key={l._id} value={l._id}>
+                  {l?.name?.en || l.code}
                 </option>
               ))}
             </select>
+            <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+              {t("overrideLocationHelp")}
+            </div>
           </label>
 
-          <button className="btn" type="button" disabled={loading || !profileId} onClick={fetchRecommendations}>
+          {overrideLocationId ? (
+            <div className="chips">
+              <span className="chip chipWarn">
+                {t("overrideActive")}: {overrideLabel()}
+              </span>
+            </div>
+          ) : null}
+
+          <button className="btn" type="button" disabled={loading || !profile?._id} onClick={fetchRecommendations}>
             {loading ? "..." : t("cropFetch")}
           </button>
         </div>

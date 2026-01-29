@@ -6,10 +6,14 @@ import { NavLink } from "react-router-dom";
 export default function FertilizerGuidancePage() {
   const { t } = useI18n();
 
-  const [profiles, setProfiles] = useState([]);
-  const [loadingProfiles, setLoadingProfiles] = useState(true);
-  const [profilesError, setProfilesError] = useState(null);
-  const [profileId, setProfileId] = useState("");
+  const [profile, setProfile] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [profileError, setProfileError] = useState(null);
+
+  const [locations, setLocations] = useState([]);
+  const [loadingLocations, setLoadingLocations] = useState(true);
+  const [locationsError, setLocationsError] = useState(null);
+  const [overrideLocationId, setOverrideLocationId] = useState("");
 
   const [crop, setCrop] = useState("wheat");
   const [loading, setLoading] = useState(false);
@@ -18,21 +22,43 @@ export default function FertilizerGuidancePage() {
 
   useEffect(() => {
     let alive = true;
-    setLoadingProfiles(true);
-    setProfilesError(null);
-    apiRequest("/profiles")
-      .then((items) => {
+    setLoadingProfile(true);
+    setProfileError(null);
+    apiRequest("/me/profile")
+      .then((p) => {
         if (!alive) return;
-        setProfiles(Array.isArray(items) ? items : []);
-        if (Array.isArray(items) && items.length > 0) setProfileId(items[0]._id);
+        setProfile(p);
       })
       .catch((e) => {
         if (!alive) return;
-        setProfilesError(e);
+        setProfileError(e);
       })
       .finally(() => {
         if (!alive) return;
-        setLoadingProfiles(false);
+        setLoadingProfile(false);
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    setLoadingLocations(true);
+    setLocationsError(null);
+    apiRequest("/locations")
+      .then((items) => {
+        if (!alive) return;
+        setLocations(Array.isArray(items) ? items : []);
+      })
+      .catch((e) => {
+        if (!alive) return;
+        setLocationsError(e);
+      })
+      .finally(() => {
+        if (!alive) return;
+        setLoadingLocations(false);
       });
 
     return () => {
@@ -41,13 +67,14 @@ export default function FertilizerGuidancePage() {
   }, []);
 
   const fetchGuidance = async () => {
-    if (!profileId) return;
+    if (!profile?._id) return;
     setLoading(true);
     setError(null);
     setResult(null);
     try {
-      const qs = new URLSearchParams({ profileId });
+      const qs = new URLSearchParams();
       if (crop) qs.set("crop", crop);
+      if (overrideLocationId) qs.set("locationId", overrideLocationId);
       const data = await apiRequest(`/recommendations/fertilizer?${qs.toString()}`);
       setResult(data);
     } catch (e) {
@@ -55,6 +82,12 @@ export default function FertilizerGuidancePage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const overrideLabel = () => {
+    if (!overrideLocationId) return null;
+    const x = locations.find((l) => l._id === overrideLocationId);
+    return x?.name?.en || x?.code || "-";
   };
 
   const renderGuidance = () => {
@@ -144,38 +177,72 @@ export default function FertilizerGuidancePage() {
       <h1>{t("pageFertilizerTitle")}</h1>
       <p>{t("pageFertilizerBody")}</p>
 
-      {profilesError ? (
+      {profileError ? (
         <div className="card">
           <strong>{t("fertErrorProfiles")}</strong>
-          <div className="muted">{String(profilesError.message || profilesError)}</div>
+          <div className="muted">{String(profileError.message || profileError)}</div>
         </div>
       ) : null}
 
-      {!loadingProfiles && profiles.length === 0 ? (
+      {!loadingProfile && !profile ? (
         <div className="card">
           <div className="muted">{t("fertNoProfiles")}</div>
+          <div className="ctaRow" style={{ marginTop: 10 }}>
+            <NavLink className="ctaLink" to="/profile">
+              {t("commonGoToProfile")}
+            </NavLink>
+          </div>
+        </div>
+      ) : null}
+
+      {locationsError ? (
+        <div className="card">
+          <strong>{t("profileLocationLoadError")}</strong>
+          <div className="muted">{String(locationsError.message || locationsError)}</div>
         </div>
       ) : null}
 
       <div className="card">
         <div style={{ display: "grid", gap: 10 }}>
+          <div className="chips">
+            <span className="chip">
+              {t("fertSelectProfile")}: {profile?.name || profile?.locationId?.name?.en || "-"}
+            </span>
+          </div>
+
           <label>
-            <div><strong>{t("fertSelectProfile")}</strong></div>
-            <select value={profileId} onChange={(e) => setProfileId(e.target.value)} disabled={loadingProfiles}>
-              {profiles.map((p) => (
-                <option key={p._id} value={p._id}>
-                  {p.location} ({p._id})
+            <div><strong>{t("overrideLocationLabel")}</strong></div>
+            <select
+              value={overrideLocationId}
+              onChange={(e) => setOverrideLocationId(e.target.value)}
+              disabled={loadingLocations || locations.length === 0}
+            >
+              <option value="">{t("overrideLocationNone")}</option>
+              {locations.map((l) => (
+                <option key={l._id} value={l._id}>
+                  {l?.name?.en || l.code}
                 </option>
               ))}
             </select>
+            <div className="muted" style={{ fontSize: 12, marginTop: 4 }}>
+              {t("overrideLocationHelp")}
+            </div>
           </label>
+
+          {overrideLocationId ? (
+            <div className="chips">
+              <span className="chip chipWarn">
+                {t("overrideActive")}: {overrideLabel()}
+              </span>
+            </div>
+          ) : null}
 
           <label>
             <div><strong>{t("fertCropOptional")}</strong></div>
             <input value={crop} onChange={(e) => setCrop(e.target.value)} placeholder="wheat / rice" />
           </label>
 
-          <button className="btn" type="button" disabled={loading || !profileId} onClick={fetchGuidance}>
+          <button className="btn" type="button" disabled={loading || !profile?._id} onClick={fetchGuidance}>
             {loading ? "..." : t("fertFetch")}
           </button>
         </div>

@@ -1,9 +1,9 @@
 /**
- * Location resolver (Punjab-focused) — Review-01
+ * Location resolver (legacy)
  *
- * Goal:
- * - Convert simple district/city strings to lat/lon without external geocoding.
- * - Keep it deterministic and demo-friendly.
+ * NOTE: Gap #1 introduces a Location master collection.
+ * For most flows we now prefer using `profile.locationId.center` (populated Location).
+ * This file remains only as a fallback for older demo data or free-text inputs.
  */
 
 const PUNJAB_LOCATIONS = {
@@ -64,4 +64,3 @@ function resolveLatLon(locationText) {
 }
 
 module.exports = { resolveLatLon };
-

@@ -1,13 +1,18 @@
 const express = require("express");
 const FarmerProfile = require("../models/FarmerProfile");
 const SoilTest = require("../models/SoilTest");
+const Location = require("../models/Location");
+const { requireAuth } = require("../middleware/auth");
+const { isValidObjectId } = require("../utils/validation");
 const { recommendCrops } = require("../services/cropRecommendationService");
 const { generateFertilizerGuidance } = require("../services/fertilizerGuidanceService");
-const { resolveLatLon } = require("../services/locationResolverService");
 const { getSevenDayForecast } = require("../services/weatherService");
 const { buildAlertsFromForecastDays } = require("../services/weatherAlertService");
 
 const router = express.Router();
+
+// New UX flow requires auth (single profile per farmer)
+router.use(requireAuth);
 
 /**
  * Crop recommendation (rule-based v1)
@@ -17,13 +22,45 @@ const router = express.Router();
  */
 router.get("/crop", async (req, res, next) => {
   try {
-    const { profileId } = req.query;
-    if (!profileId) return res.status(400).json({ error: "profileId is required" });
+    // Prefer authenticated single-profile flow.
+    // If profileId is not provided, use auth context.
+    const effectiveProfileId = req.query.profileId || req.auth?.profileId;
+    if (!effectiveProfileId) return res.status(400).json({ error: "profileId is required" });
 
-    const profile = await FarmerProfile.findById(profileId);
+    // Single-profile-per-farmer: prevent cross-profile access even if profile.farmerId is not set
+    if (req.query.profileId && String(req.query.profileId) !== String(req.auth.profileId)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const profile = await FarmerProfile.findById(effectiveProfileId)
+      .populate("locationId")
+      .populate("seasonId")
+      .populate("previousCropId");
     if (!profile) return res.status(404).json({ error: "Profile not found" });
 
-    const latestSoil = await SoilTest.findOne({ profileId }).sort({ createdAt: -1 });
+    // Enforce ownership if auth is present
+    if (req.auth?.farmerId && profile.farmerId && String(profile.farmerId) !== String(req.auth.farmerId)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    // Optional location override
+    let effectiveLocation = profile.locationId;
+    if (req.query.locationId) {
+      const id = String(req.query.locationId);
+      if (!isValidObjectId(id)) {
+        return res.status(400).json({ error: "Validation error", details: ["locationId must be a valid ObjectId"] });
+      }
+      const override = await Location.findById(id);
+      if (!override) {
+        return res.status(400).json({ error: "Validation error", details: ["locationId is invalid"] });
+      }
+      effectiveLocation = override;
+    }
+
+    const seasonCode = profile?.seasonId?.code || profile?.seasonText || null;
+    const previousCropCode = profile?.previousCropId?.code || profile?.previousCropText || null;
+
+    const latestSoil = await SoilTest.findOne({ profileId: effectiveProfileId }).sort({ createdAt: -1 });
     if (!latestSoil) {
       return res.status(400).json({
         error: "Soil test is required",
@@ -31,8 +68,14 @@ router.get("/crop", async (req, res, next) => {
       });
     }
 
-    // Weather integration (Review-01): use profile location to resolve lat/lon, then fetch forecast + alerts.
-    const resolved = resolveLatLon(profile.location);
+    // Weather integration (Review-01): use profile master location centroid.
+    const resolved = effectiveLocation?.center
+      ? {
+          lat: effectiveLocation.center.lat,
+          lon: effectiveLocation.center.lon,
+          source: req.query.locationId ? "location_override" : "location_master",
+        }
+      : null;
     let weather = null;
     if (resolved) {
       const forecastData = await getSevenDayForecast({ lat: resolved.lat, lon: resolved.lon });
@@ -45,8 +88,8 @@ router.get("/crop", async (req, res, next) => {
     }
 
     const output = recommendCrops({
-      season: profile.season,
-      previousCrop: profile.previousCrop,
+      season: seasonCode,
+      previousCrop: previousCropCode,
       soil: {
         n: latestSoil.n,
         p: latestSoil.p,
@@ -57,12 +100,14 @@ router.get("/crop", async (req, res, next) => {
     });
 
     return res.json({
-      profileId,
+      profileId: effectiveProfileId,
       used: {
-        season: profile.season || null,
-        previousCrop: profile.previousCrop || null,
+        season: seasonCode,
+        previousCrop: previousCropCode,
         soilTestId: latestSoil._id,
-        location: profile.location || null,
+        location: effectiveLocation?.name?.en || profile.locationText || null,
+        locationId: effectiveLocation?._id || null,
+        locationOverride: Boolean(req.query.locationId),
         weather: weather,
       },
       ...output,
@@ -84,11 +129,33 @@ router.get("/crop", async (req, res, next) => {
  */
 router.get("/fertilizer", async (req, res, next) => {
   try {
-    const { profileId, crop } = req.query;
+    const { crop } = req.query;
+    const profileId = req.query.profileId || req.auth?.profileId;
     if (!profileId) return res.status(400).json({ error: "profileId is required" });
 
-    const profile = await FarmerProfile.findById(profileId);
+    if (req.query.profileId && String(req.query.profileId) !== String(req.auth.profileId)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const profile = await FarmerProfile.findById(profileId).populate("locationId");
     if (!profile) return res.status(404).json({ error: "Profile not found" });
+
+    if (req.auth?.farmerId && profile.farmerId && String(profile.farmerId) !== String(req.auth.farmerId)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    let effectiveLocation = profile.locationId;
+    if (req.query.locationId) {
+      const id = String(req.query.locationId);
+      if (!isValidObjectId(id)) {
+        return res.status(400).json({ error: "Validation error", details: ["locationId must be a valid ObjectId"] });
+      }
+      const override = await Location.findById(id);
+      if (!override) {
+        return res.status(400).json({ error: "Validation error", details: ["locationId is invalid"] });
+      }
+      effectiveLocation = override;
+    }
 
     const latestSoil = await SoilTest.findOne({ profileId }).sort({ createdAt: -1 });
     if (!latestSoil) {
@@ -113,6 +180,9 @@ router.get("/fertilizer", async (req, res, next) => {
       used: {
         soilTestId: latestSoil._id,
         crop: crop || null,
+        location: effectiveLocation?.name?.en || profile.locationText || null,
+        locationId: effectiveLocation?._id || null,
+        locationOverride: Boolean(req.query.locationId),
       },
       ...output,
     });

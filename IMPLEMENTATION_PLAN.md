@@ -1,12 +1,10 @@
-# Smart Crop Advisory System (Review-01) — Step-by-Step Implementation Plan
+# Smart Crop Advisory System (Review-01) — Implementation Plan (Status-Aligned)
 
-> **Planning-only document**
->
-> Constraints for this phase:
-> - No code
-> - No API specifications/details
-> - No commands
-> - No configuration files
+This document is kept **status-aligned with the current codebase**. The code is the source of truth.
+
+Scope note:
+- This plan focuses on the Review-01 demo system as implemented.
+- Items are marked as ✅ Implemented, 🟡 Partially implemented, or ❌ Not implemented.
 
 ## 1) Goal (What we are building)
 A **responsive web-based Smart Crop Advisory System** for small and marginal farmers that provides:
@@ -15,7 +13,7 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 - Disease identification from crop/leaf images (via a local Python ML inference service)
 - Weather forecast + simple in-app alerts (7-day)
 - Punjabi (Gurmukhi) + English language support
-- Voice-guided interface (future phase, post-review)
+- Voice-guided interface (guided keywords)
 
 ## 2) System boundaries (What we will and won’t do)
 ### In scope for the overall project
@@ -25,7 +23,7 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 - Python ML inference service (FastAPI/Flask)
 - Weather integration (public weather API)
 - Localization (English + Punjabi Gurmukhi)
-- Guided voice UI (later)
+- Guided voice UI
 
 ### Explicitly out of scope for Review-01 demo
 - Full offline/on-device ML inference
@@ -34,9 +32,12 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 - Advanced NLP chatbot (free-form) — use templates/guided flows first
 - Complex user management and KYC (keep authentication optional/minimal)
 
+Status note:
+- A **demo authentication** flow is implemented (session-token, no OTP/password). It is not production authentication.
+
 ---
 
-# Phase 0: Planning & Architecture Lock
+# Phase 0: Planning & Architecture Lock (status)
 
 ## Step 0.1 — Confirm demo scope and success criteria
 **What will be built**
@@ -56,6 +57,9 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 **Hard STOP point**
 - STOP once demo flows and success criteria are written and approved.
+
+**Status:** 🟡 Partially implemented
+- Scope exists in the repository history and can be re-documented if needed.
 
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
@@ -91,6 +95,9 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 **Hard STOP point**
 - STOP once the architecture sheet is signed off.
 
+**Status:** ✅ Implemented
+- The current repo follows the described split: React frontend, Express backend, MongoDB, optional FastAPI ML stub, external weather.
+
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
 - Everyone understands the 4 components and their responsibilities
@@ -100,7 +107,7 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 ---
 
-# Phase 1: Frontend Skeleton (UI-first, no real data)
+# Phase 1: Frontend (status)
 
 ## Step 1.1 — Create UI navigation and empty pages
 **What will be built**
@@ -130,6 +137,10 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 **Hard STOP point**
 - STOP when all pages exist and navigation works end-to-end.
 
+**Status:** ✅ Implemented
+- Pages exist and are wired to backend.
+- Current routes include: `/login`, `/`, `/profile`, `/soil`, `/crop`, `/fertilizer`, `/weather`, `/disease`, `/assistant`, `/chat`.
+
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
 - Page flow matches the planned demo story
@@ -158,6 +169,9 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 **Hard STOP point**
 - STOP when UI data needs are fully listed and agreed.
 
+**Status:** 🟡 Partially implemented
+- Data contracts are described in `TECHNICAL_SYSTEM_DOCUMENTATION.md` Appendix B.
+
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
 - UI fields are minimal and practical
@@ -168,7 +182,7 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 ---
 
-# Phase 2: Backend + Database Foundations (persistence first)
+# Phase 2: Backend + Database Foundations (status)
 
 ## Step 2.1 — Backend skeleton and health checks (internal)
 **What will be built**
@@ -192,6 +206,10 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 **Hard STOP point**
 - STOP when backend skeleton is stable.
+
+**Status:** ✅ Implemented
+- `GET /health` exists.
+- Central error handling exists in the Express app.
 
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
@@ -227,6 +245,11 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 **Hard STOP point**
 - STOP when CRUD for core records is stable.
 
+**Status:** ✅ Implemented
+- MongoDB models exist for `Location`, `Season`, `SoilType`, `Crop`, `FarmerProfile`, `SoilTest`.
+- Demo auth models exist for `FarmerAccount` and `FarmerSession`.
+- Seeds exist: `npm run seed` and `npm run seed:demo`.
+
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
 - Data is saved and shown back correctly
@@ -237,7 +260,7 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 ---
 
-# Phase 3: Core Advisory Logic (Rule-based crop + fertilizer)
+# Phase 3: Core Advisory Logic (status)
 
 ## Step 3.1 — Implement rule engine for crop recommendation (v1)
 **What will be built**
@@ -262,6 +285,10 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 **Hard STOP point**
 - STOP when recommendation rules are documented and produce stable outputs.
+
+**Status:** ✅ Implemented
+- Rule engine implemented in `backend/src/services/cropRecommendationService.js`.
+- Current crop scope is intentionally limited to **Wheat** and **Rice**.
 
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
@@ -296,6 +323,10 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 **Hard STOP point**
 - STOP when fertilizer plan output is stable and understandable.
 
+**Status:** ✅ Implemented
+- Implemented in `backend/src/services/fertilizerGuidanceService.js`.
+- Crop-specific schedules only for wheat/rice; other crop values fall back to a generic schedule.
+
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
 - Fertilizer plan language is safe (no risky dosing)
@@ -306,7 +337,7 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 ---
 
-# Phase 4: ML Disease Detection (Python service integration)
+# Phase 4: ML Disease Detection (status)
 
 ## Step 4.1 — ML service skeleton (stub-first)
 **What will be built**
@@ -328,6 +359,11 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 **Hard STOP point**
 - STOP when the end-to-end “upload → prediction response” pipeline works with stub.
+
+**Status:** ✅ Implemented
+- FastAPI stub exists in `ml-service/app.py`.
+- Backend forwards uploads via `POST /disease/predict` to `ML_BASE_URL/predict-disease`.
+- Backend enriches response with bilingual remedy text.
 
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
@@ -360,6 +396,9 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 **Hard STOP point**
 - STOP when model predictions are consistent enough for demo.
 
+**Status:** ❌ Not implemented
+- ML service remains a deterministic stub.
+
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
 - Predicted disease labels match expected examples reasonably
@@ -370,13 +409,13 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 ---
 
-# Phase 5: Weather Forecast + In-App Alerts
+# Phase 5: Weather Forecast + In-App Alerts (status)
 
 ## Step 5.1 — Weather data integration (normalized)
 **What will be built**
 - Weather module that fetches and displays:
   - 7-day forecast
-  - key metrics (temp, humidity, rainfall probability)
+  - key metrics currently implemented: max/min temperature, precipitation probability max, rain sum
 - Include simple caching to avoid excessive calls.
 
 **Why this step exists**
@@ -394,6 +433,10 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 **Hard STOP point**
 - STOP when forecast view is stable and resilient.
+
+**Status:** ✅ Implemented
+- Implemented in `backend/src/services/weatherService.js` (Open-Meteo + in-memory cache).
+- UI uses profile-based district centroid via `GET /weather/forecast/by-profile`.
 
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
@@ -425,6 +468,10 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 **Hard STOP point**
 - STOP when alert rules are stable and not spammy.
 
+**Status:** ✅ Implemented
+- Implemented in `backend/src/services/weatherAlertService.js`.
+- Alert messages are currently returned in English.
+
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
 - Alerts are actionable and not misleading
@@ -435,7 +482,7 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 ---
 
-# Phase 6: Localization & NLP (Punjabi + English)
+# Phase 6: Localization & Guided Assistant (status)
 
 ## Step 6.1 — Localization foundation (English + Punjabi Gurmukhi)
 **What will be built**
@@ -462,6 +509,14 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 **Hard STOP point**
 - STOP when all core screens are fully bilingual.
+
+**Status:** 🟡 Partially implemented
+- UI labels are bilingual (English + Punjabi) via `frontend/src/i18n/translations.js`.
+- Advisory content strings are mixed:
+  - Disease remedy content is bilingual.
+  - Crop recommendation reasons/warnings are currently English.
+  - Fertilizer schedule and guidance text are currently English.
+  - Weather alert messages are currently English.
 
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
@@ -495,6 +550,10 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 **Hard STOP point**
 - STOP once guided assistant flow works end-to-end.
 
+**Status:** ✅ Implemented
+- Assistant page provides guided navigation buttons.
+- Voice mode uses browser speech recognition and can also speak chatbot replies.
+
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
 - Assistant reduces user effort (fewer clicks)
@@ -505,7 +564,7 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 
 ---
 
-# Phase 7: Voice Interface (Post-Review / Optional Future)
+# Phase 7: Voice Interface (status)
 
 ## Step 7.1 — Voice input/output using browser capabilities
 **What will be built**
@@ -531,6 +590,10 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 **Hard STOP point**
 - STOP after voice works for 2–3 guided flows.
 
+**Status:** ✅ Implemented
+- Implemented in `frontend/src/pages/AssistantPage.jsx` + `frontend/src/voice/useVoiceCommands.js`.
+- Works only in browsers that support SpeechRecognition.
+
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
 - Voice mode does not block normal usage
@@ -542,15 +605,18 @@ A **responsive web-based Smart Crop Advisory System** for small and marginal far
 ---
 
 # Final Review-01 Demo Checklist (must be true before submission)
-1. UI flows complete: Profile → Soil → Crop/Fertilizer advice
-2. Disease scan flow works end-to-end (stub or real model) with treatment text
-3. Weather forecast page shows 7-day forecast and at least 1 alert type
-4. Data persistence: profile and history are saved and visible
-5. Language toggle: English + Punjabi across core screens
-6. Demo script: 5–7 minutes, repeatable, with known sample inputs/images
+1. Demo login works: `/login` lists demo farmers and stores a token.
+2. UI flows complete: Profile → Soil → Crop → Fertilizer → Weather.
+3. Disease scan works end-to-end **only if** the ML service is running (stub) and returns remedy text.
+4. Weather page shows 7-day forecast and alerts (internet required for Open-Meteo).
+5. Data persistence: profile and soil tests are saved and visible.
+6. Language toggle changes UI labels (advisory content is partially bilingual).
+7. Demo script: repeatable with known sample inputs.
 
 ---
 
 # Overall hard rule
 After each **⛔ STOP & REVIEW CHECKPOINT**, the system must STOP and the next phase proceeds **only after user approval**.
 
+Status note:
+- The codebase has already progressed beyond the checkpoint flow; checkpoints are kept as a narrative structure, not as a current execution gate.

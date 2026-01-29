@@ -15,9 +15,21 @@ export const translations = {
     navWeather: "Weather",
     navAssistant: "Assistant",
     navChat: "Chatbot",
+    navLogin: "Login",
 
     pageDashboardTitle: "Dashboard",
     pageDashboardBody: "This is a placeholder dashboard for the Smart Crop Advisory System.",
+
+    pageLoginTitle: "Login",
+    pageLoginBody: "Select a demo farmer to continue.",
+    loginSelectFarmer: "Select farmer",
+    loginButton: "Login",
+    loginError: "Login failed",
+
+    overrideLocationLabel: "Location override (optional)",
+    overrideLocationNone: "Use profile location",
+    overrideLocationHelp: "This changes only this screen’s result. Your saved profile will not be updated.",
+    overrideActive: "Override active",
 
     dashHeroTitle: "Smart Crop Advisory",
     dashHeroSub:
@@ -50,6 +62,7 @@ export const translations = {
     commonNext: "Next",
     commonView: "View",
     commonRawJson: "Raw JSON",
+    commonOptionalNone: "(Optional) None",
 
     cropWeatherUsed: "Weather used",
     cropAlerts: "Alerts",
@@ -71,6 +84,9 @@ export const translations = {
     pageProfileBody: "Enter your details and save.",
     profileName: "Name (optional)",
     profileLocation: "Location (required)",
+    profileLocationHelp: "Select your district in Punjab.",
+    profileLocationLoadError: "Could not load location list",
+    profileMastersLoadError: "Could not load dropdown lists",
     profileSoilType: "Soil type (optional)",
     profilePreviousCrop: "Previous crop (optional)",
     profileSeason: "Season (optional)",
@@ -82,6 +98,7 @@ export const translations = {
     pageSoilBody: "Select profile and enter soil test values.",
     soilSelectProfile: "Select profile",
     soilNoProfiles: "No profiles found. Please save a profile first.",
+    commonGoToProfile: "Go to Profile",
     soilN: "Nitrogen (N)",
     soilP: "Phosphorus (P)",
     soilK: "Potassium (K)",
@@ -133,14 +150,18 @@ export const translations = {
     diseaseSafety: "Safety",
 
     pageWeatherTitle: "Weather (7-day)",
-    pageWeatherBody: "Enter location coordinates and fetch 7-day forecast.",
-    weatherLat: "Latitude",
-    weatherLon: "Longitude",
+    pageWeatherBody: "Select your saved profile to fetch a 7-day forecast.",
+    weatherSelectProfile: "Select profile",
     weatherFetch: "Get forecast",
+    weatherUsed: "Location used",
+    weatherDistrict: "District",
     weatherForecast: "Forecast",
     weatherAlerts: "Alerts",
     weatherNoAlerts: "No alerts",
     weatherError: "Could not fetch weather",
+
+    weatherNoProfiles: "No profiles found. Please save a profile first.",
+    weatherErrorProfiles: "Could not load profiles",
 
     weatherTableDate: "Date",
     weatherTableMin: "Min (°C)",
@@ -151,6 +172,7 @@ export const translations = {
     weatherCardsTitle: "Next 7 days",
     weatherCardTemp: "Temp",
     weatherCardRain: "Rain",
+    weatherCardRainMm: "mm",
 
     pageNotFoundTitle: "Page not found",
     pageNotFoundBody: "The page you are looking for doesn’t exist.",
@@ -210,9 +232,21 @@ export const translations = {
     navWeather: "ਮੌਸਮ",
     navAssistant: "ਸਹਾਇਕ",
     navChat: "ਚੈਟਬੌਟ",
+    navLogin: "ਲੌਗਿਨ",
 
     pageDashboardTitle: "ਡੈਸ਼ਬੋਰਡ",
     pageDashboardBody: "ਇਹ ਸਮਾਰਟ ਫਸਲ ਸਲਾਹਕਾਰ ਸਿਸਟਮ ਲਈ ਪਲੇਸਹੋਲਡਰ ਡੈਸ਼ਬੋਰਡ ਹੈ।",
+
+    pageLoginTitle: "ਲੌਗਿਨ",
+    pageLoginBody: "ਜਾਰੀ ਰੱਖਣ ਲਈ ਡੈਮੋ ਕਿਸਾਨ ਚੁਣੋ।",
+    loginSelectFarmer: "ਕਿਸਾਨ ਚੁਣੋ",
+    loginButton: "ਲੌਗਿਨ",
+    loginError: "ਲੌਗਿਨ ਫੇਲ੍ਹ ਹੋਇਆ",
+
+    overrideLocationLabel: "ਸਥਾਨ ਓਵਰਰਾਈਡ (ਚੋਣਵਾਂ)",
+    overrideLocationNone: "ਪ੍ਰੋਫ਼ਾਈਲ ਸਥਾਨ ਵਰਤੋ",
+    overrideLocationHelp: "ਇਹ ਸਿਰਫ਼ ਇਸ ਸਕਰੀਨ ਦੇ ਨਤੀਜੇ ਲਈ ਹੈ। ਤੁਹਾਡਾ ਸੇਵ ਕੀਤਾ ਪ੍ਰੋਫ਼ਾਈਲ ਨਹੀਂ ਬਦਲੇਗਾ।",
+    overrideActive: "ਓਵਰਰਾਈਡ ਚਾਲੂ",
 
     dashHeroTitle: "ਸਮਾਰਟ ਫਸਲ ਸਲਾਹਕਾਰ",
     dashHeroSub:
@@ -245,6 +279,7 @@ export const translations = {
     commonNext: "ਅਗਲਾ",
     commonView: "ਵੇਖੋ",
     commonRawJson: "ਕੱਚਾ JSON",
+    commonOptionalNone: "(ਚੋਣਵਾਂ) ਨਹੀਂ",
 
     cropWeatherUsed: "ਵਰਤਿਆ ਗਿਆ ਮੌਸਮ",
     cropAlerts: "ਐਲਰਟ",
@@ -266,6 +301,9 @@ export const translations = {
     pageProfileBody: "ਆਪਣੀ ਜਾਣਕਾਰੀ ਭਰੋ ਅਤੇ ਸੇਵ ਕਰੋ।",
     profileName: "ਨਾਂ (ਚੋਣਵਾਂ)",
     profileLocation: "ਸਥਾਨ (ਲਾਜ਼ਮੀ)",
+    profileLocationHelp: "ਪੰਜਾਬ ਵਿੱਚ ਆਪਣਾ ਜ਼ਿਲ੍ਹਾ ਚੁਣੋ।",
+    profileLocationLoadError: "ਸਥਾਨ ਲਿਸਟ ਲੋਡ ਨਹੀਂ ਹੋਈ",
+    profileMastersLoadError: "ਡ੍ਰੌਪਡਾਊਨ ਲਿਸਟਾਂ ਲੋਡ ਨਹੀਂ ਹੋਈਆਂ",
     profileSoilType: "ਮਿੱਟੀ ਦੀ ਕਿਸਮ (ਚੋਣਵਾਂ)",
     profilePreviousCrop: "ਪਿਛਲੀ ਫਸਲ (ਚੋਣਵਾਂ)",
     profileSeason: "ਸੀਜ਼ਨ (ਚੋਣਵਾਂ)",
@@ -277,6 +315,7 @@ export const translations = {
     pageSoilBody: "ਪ੍ਰੋਫ਼ਾਈਲ ਚੁਣੋ ਅਤੇ ਮਿੱਟੀ ਜਾਂਚ ਦੇ ਮੁੱਲ ਭਰੋ।",
     soilSelectProfile: "ਪ੍ਰੋਫ਼ਾਈਲ ਚੁਣੋ",
     soilNoProfiles: "ਕੋਈ ਪ੍ਰੋਫ਼ਾਈਲ ਨਹੀਂ ਮਿਲਿਆ। ਪਹਿਲਾਂ ਪ੍ਰੋਫ਼ਾਈਲ ਸੇਵ ਕਰੋ।",
+    commonGoToProfile: "ਪ੍ਰੋਫ਼ਾਈਲ ਤੇ ਜਾਓ",
     soilN: "ਨਾਈਟ੍ਰੋਜਨ (N)",
     soilP: "ਫਾਸਫੋਰਸ (P)",
     soilK: "ਪੋਟਾਸ਼ੀਅਮ (K)",
@@ -328,14 +367,18 @@ export const translations = {
     diseaseSafety: "ਸੁਰੱਖਿਆ",
 
     pageWeatherTitle: "ਮੌਸਮ (7 ਦਿਨ)",
-    pageWeatherBody: "ਅਕਸ਼ਾਂਸ/ਦੇਸ਼ਾਂਤਰ ਭਰੋ ਅਤੇ 7 ਦਿਨਾਂ ਦੀ ਭਵਿੱਖਬਾਣੀ ਲਵੋ।",
-    weatherLat: "ਅਕਸ਼ਾਂਸ",
-    weatherLon: "ਦੇਸ਼ਾਂਤਰ",
+    pageWeatherBody: "ਆਪਣਾ ਸੇਵ ਕੀਤਾ ਪ੍ਰੋਫ਼ਾਈਲ ਚੁਣੋ ਅਤੇ 7 ਦਿਨਾਂ ਦੀ ਭਵਿੱਖਬਾਣੀ ਲਵੋ।",
+    weatherSelectProfile: "ਪ੍ਰੋਫ਼ਾਈਲ ਚੁਣੋ",
     weatherFetch: "ਭਵਿੱਖਬਾਣੀ ਲਵੋ",
+    weatherUsed: "ਵਰਤਿਆ ਗਿਆ ਸਥਾਨ",
+    weatherDistrict: "ਜ਼ਿਲ੍ਹਾ",
     weatherForecast: "ਭਵਿੱਖਬਾਣੀ",
     weatherAlerts: "ਐਲਰਟ",
     weatherNoAlerts: "ਕੋਈ ਐਲਰਟ ਨਹੀਂ",
     weatherError: "ਮੌਸਮ ਨਹੀਂ ਮਿਲਿਆ",
+
+    weatherNoProfiles: "ਕੋਈ ਪ੍ਰੋਫ਼ਾਈਲ ਨਹੀਂ ਮਿਲਿਆ। ਪਹਿਲਾਂ ਪ੍ਰੋਫ਼ਾਈਲ ਸੇਵ ਕਰੋ।",
+    weatherErrorProfiles: "ਪ੍ਰੋਫ਼ਾਈਲ ਲੋਡ ਨਹੀਂ ਹੋਇਆ",
 
     weatherTableDate: "ਤਾਰੀਖ",
     weatherTableMin: "ਘੱਟੋ-ਘੱਟ (°C)",
@@ -346,6 +389,7 @@ export const translations = {
     weatherCardsTitle: "ਅਗਲੇ 7 ਦਿਨ",
     weatherCardTemp: "ਤਾਪਮਾਨ",
     weatherCardRain: "ਬਰਸਾਤ",
+    weatherCardRainMm: "mm",
 
     pageNotFoundTitle: "ਪੰਨਾ ਨਹੀਂ ਮਿਲਿਆ",
     pageNotFoundBody: "ਤੁਸੀਂ ਜੋ ਪੰਨਾ ਲੱਭ ਰਹੇ ਹੋ ਉਹ ਮੌਜੂਦ ਨਹੀਂ ਹੈ।",

@@ -9,6 +9,12 @@ const diseaseRoutes = require("./routes/diseaseRoutes");
 const weatherRoutes = require("./routes/weatherRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const edgeRoutes = require("./routes/edgeRoutes");
+const locationRoutes = require("./routes/locationRoutes");
+const seasonRoutes = require("./routes/seasonRoutes");
+const soilTypeRoutes = require("./routes/soilTypeRoutes");
+const cropRoutes = require("./routes/cropRoutes");
+const authRoutes = require("./routes/authRoutes");
+const meRoutes = require("./routes/meRoutes");
 
 const PORT = process.env.PORT || 5000;
 
@@ -34,6 +40,12 @@ app.get("/health", (req, res) => {
 });
 
 // CRUD routes (persistence only)
+app.use("/", authRoutes);
+app.use("/", meRoutes);
+app.use("/locations", locationRoutes);
+app.use("/seasons", seasonRoutes);
+app.use("/soil-types", soilTypeRoutes);
+app.use("/crops", cropRoutes);
 app.use("/profiles", profileRoutes);
 app.use("/soil-tests", soilTestRoutes);
 

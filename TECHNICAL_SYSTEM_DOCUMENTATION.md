@@ -15,7 +15,7 @@ Provide a Review-01 level “Smart Crop Advisory” demo system with:
 - English + Punjabi UI
 
 ### Target users
-Small and marginal farmers; low digital literacy considered (see `REVIEW_1_SCOPE.md`).
+Small and marginal farmers; low digital literacy considered.
 
 ### Real-world relevance
 The project demonstrates how farm advisory workflows can be built using a web UI, a backend API, and external data sources (weather), with a placeholder for ML-based disease inference.
@@ -64,34 +64,40 @@ Node/Express Backend (5000)
 - Custom i18n provider (`frontend/src/i18n/I18nContext.jsx`, `translations.js`)
 
 ### Total number of screens/pages
-10 screens/routes are defined (including Not Found).
+11 screens/routes are defined (including Not Found).
 
 ### Screen-wise description
 Routes (from `frontend/src/App.jsx`):
+0. `/login` — Login (demo)
+   - Select a seeded demo farmer; stores a token in `localStorage`.
 1. `/` — Dashboard
    - Demo flow steps, quick actions, and edge status display.
 2. `/profile` — Farmer Profile
-   - Form to save a profile via backend.
+   - Edit the current farmer’s single profile (requires auth).
 3. `/soil` — Soil Input
-   - Select a profile and save soil test values.
+   - Save a soil test for the current farmer’s profile (requires auth).
 4. `/crop` — Crop Recommendation
-   - Select profile and fetch crop recommendations.
+   - Fetch crop recommendations for the current farmer (requires auth). Optional location override.
 5. `/fertilizer` — Fertilizer Guidance
-   - Select profile and fetch fertilizer guidance (optional crop string).
+   - Fetch fertilizer guidance using latest soil test (requires auth). Optional crop string + location override.
 6. `/disease` — Disease Detection
    - Upload a leaf image; show predicted disease and remedy text.
 7. `/weather` — Weather
-   - Input latitude/longitude and fetch 7-day forecast + alerts.
+   - Fetch 7-day forecast + alerts for current farmer’s saved district (requires auth). Optional location override.
 8. `/assistant` — Assistant
-   - Guided navigation + voice mode; can speak chatbot replies.
+   - Guided navigation + voice mode (browser speech recognition). Can speak chatbot replies.
 9. `/chat` — Chatbot
    - Text input; gets rule-based response.
 10. `*` — Not Found
    - Basic 404 message.
 
 ### User flow (implemented)
-Typical demo flow (matches `REVIEW_1_SCOPE.md`):
-1) Create farmer profile → 2) Enter soil test → 3) Get crop recommendation → 4) Get fertilizer guidance → optionally check weather and disease scan.
+Typical demo flow:
+1) Login → 2) Update Profile → 3) Save Soil Test → 4) Crop Recommendation → 5) Fertilizer Guidance → optionally check Weather and Disease.
+
+Note:
+- The frontend enforces demo login for all routes except `/login`.
+- Some backend endpoints are still public (e.g., `/chat`, `/edge/status`), but the current UI still requires login to reach those pages.
 
 ## 4. Backend Details
 ### Technology stack
@@ -113,8 +119,21 @@ Typical demo flow (matches `REVIEW_1_SCOPE.md`):
 - JSON for most endpoints.
 - Multipart/form-data for image upload (`/disease/predict`).
 
+Validation notes (current):
+- Backend performs basic allowlisting + validation for core CRUD endpoints (profiles, soil tests) and the single-profile endpoints (`/me/profile`).
+- Invalid inputs return HTTP 400 with `{ error: "Validation error", details: [...] }`.
+
 ### Authentication/authorization
-- None implemented in code.
+- Demo session-token authentication (no passwords / OTP).
+  - `POST /login` issues a UUID token.
+  - Token is stored in MongoDB `FarmerSession` (TTL expiry).
+  - Client sends `Authorization: Bearer <token>`.
+  - Single-profile-per-farmer enforced via `FarmerAccount.profileId`.
+
+Notes:
+- `/login` UI uses `GET /farmers/demo` to populate the farmer dropdown.
+- Auth is enforced for: `/me/profile`, `/soil-tests`, `/recommendations/*`, `/weather/forecast/by-profile`.
+- Other endpoints like `/locations`, `/seasons`, `/soil-types`, `/crops`, `/chat`, `/edge/status` are public.
 
 ## 5. API Specification
 All endpoints are mounted from `backend/src/server.js`.
@@ -126,20 +145,68 @@ All endpoints are mounted from `backend/src/server.js`.
 - **Input:** None
 - **Output:** `{ "status": "ok" }`
 
-### 5.2 Profiles
+### 5.2 Demo Auth
+**Endpoint:** `/farmers/demo`
+- **Method:** GET
+- **Purpose:** List demo farmers for login dropdown.
+- **Output:** array of `{ farmerId, name }`.
+
+**Endpoint:** `/login`
+- **Method:** POST
+- **Purpose:** Demo login.
+- **Input:** `{ name }`
+- **Output:** `{ token, farmerId, profileId, expiresAt }`
+
+### 5.3 Current Farmer Profile (single profile)
+**Endpoint:** `/me/profile`
+- **Method:** GET
+- **Auth:** required
+- **Purpose:** Fetch the logged-in farmer’s single profile.
+
+**Endpoint:** `/me/profile`
+- **Method:** PUT
+- **Auth:** required
+- **Purpose:** Update the logged-in farmer’s single profile.
+
+### 5.4 Domain masters (dropdown sources)
+These are used by the Profile screen.
+
+**Endpoint:** `/locations`
+- **Method:** GET
+- **Purpose:** List active Punjab locations for dropdowns.
+
+**Endpoint:** `/seasons`
+- **Method:** GET
+- **Purpose:** List active seasons.
+
+**Endpoint:** `/soil-types`
+- **Method:** GET
+- **Purpose:** List active soil types.
+
+**Endpoint:** `/crops`
+- **Method:** GET
+- **Purpose:** List active crops.
+
+### 5.5 Profiles (legacy CRUD; still present)
 **Endpoint:** `/profiles`
 - **Method:** POST
 - **Purpose:** Create farmer profile.
 - **Input (JSON):**
-  - `location` (string, required)
-  - `name`, `soilType`, `previousCrop`, `season` (optional strings)
+  - `locationId` (ObjectId string, required)
+  - `name` (optional string)
+  - `soilTypeId`, `previousCropId`, `seasonId` (optional ObjectId strings)
+  - Legacy compatibility fields may exist in older records (`locationText`, `soilTypeText`, `previousCropText`, `seasonText`) but are not written by the current UI.
 - **Output:** Created `FarmerProfile` document.
+
+Notes:
+- These legacy endpoints do **not** enforce demo login in the backend.
+- The current UI uses `/me/profile` instead.
 
 **Endpoint:** `/profiles`
 - **Method:** GET
 - **Purpose:** List profiles.
 - **Input:** None
-- **Output:** Array of `FarmerProfile` documents (sorted by `createdAt` desc).
+- **Output:** Array of `FarmerProfile` documents (sorted by `createdAt` desc), with `locationId` populated.
 
 **Endpoint:** `/profiles/:id`
 - **Method:** GET
@@ -153,33 +220,32 @@ All endpoints are mounted from `backend/src/server.js`.
 - **Input:** URL param `id` + JSON body fields
 - **Output:** Updated `FarmerProfile` or `{ error: "Not found" }`.
 
-### 5.3 Soil Tests
+### 5.6 Soil Tests
 **Endpoint:** `/soil-tests`
+- **Auth:** required
 - **Method:** POST
-- **Purpose:** Create soil test record.
+- **Purpose:** Create soil test record for the logged-in farmer’s profile.
 - **Input (JSON):**
-  - `profileId` (ObjectId string, required)
   - `n`, `p`, `k`, `ph` (numbers, required)
   - `testDate` (date, optional)
-- **Output:** Created `SoilTest` document.
+  - `profileId` (optional; if provided must match the logged-in farmer profile)
 
 **Endpoint:** `/soil-tests`
+- **Auth:** required
 - **Method:** GET
-- **Purpose:** List soil tests; optionally filter by profile.
-- **Input (query):** `profileId` (optional)
-- **Output:** Array of `SoilTest` documents.
+- **Purpose:** List soil tests for the logged-in farmer’s profile.
 
 **Endpoint:** `/soil-tests/:id`
+- **Auth:** required
 - **Method:** GET
-- **Purpose:** Get soil test by id.
-- **Input:** URL param `id`
-- **Output:** `SoilTest` document or `{ error: "Not found" }`.
+- **Purpose:** Get a soil test by id (must belong to logged-in farmer).
 
-### 5.4 Recommendations
+### 5.7 Recommendations
 **Endpoint:** `/recommendations/crop`
 - **Method:** GET
 - **Purpose:** Return rule-based crop recommendations for a profile.
-- **Input (query):** `profileId` (required)
+- **Auth:** required
+- **Input (query):** `locationId` (optional override)
 - **Output (JSON):**
   - `profileId`
   - `used`: includes `soilTestId`, `location`, optional `weather` info
@@ -189,16 +255,17 @@ All endpoints are mounted from `backend/src/server.js`.
 **Endpoint:** `/recommendations/fertilizer`
 - **Method:** GET
 - **Purpose:** Return fertilizer guidance using latest soil test.
+- **Auth:** required
 - **Input (query):**
-  - `profileId` (required)
   - `crop` (optional string)
+  - `locationId` (optional override)
 - **Output (JSON):**
   - `profileId`
   - `used`: includes `soilTestId` and `crop`
   - `guidance`: soil summary + schedule + safety notes
   - `missingInputs`
 
-### 5.5 Weather
+### 5.8 Weather
 **Endpoint:** `/weather/forecast`
 - **Method:** GET
 - **Purpose:** Fetch and normalize 7-day forecast and generate simple alerts.
@@ -206,7 +273,20 @@ All endpoints are mounted from `backend/src/server.js`.
 - **Output (JSON):**
   - `location`, `timezone`, `forecast: { days: [...] }`, `cached`, `alerts: [...]`
 
-### 5.6 Disease
+**Endpoint:** `/weather/forecast/by-profile`
+- **Method:** GET
+- **Purpose:** Fetch 7-day forecast using the profile’s saved Punjab district (Location master).
+- **Auth:** required
+- **Input (query):** `locationId` (optional override)
+- **Output (JSON):**
+  - Same as `/weather/forecast` plus:
+  - `used: { profileId, locationId, locationName, lat, lon, source }`
+
+Note:
+- `/weather/forecast` is public (requires `lat`/`lon`).
+- `/weather/forecast/by-profile` is auth-protected and uses the logged-in farmer profile.
+
+### 5.9 Disease
 **Endpoint:** `/disease/predict`
 - **Method:** POST
 - **Purpose:** Upload an image and get disease prediction response from ML service + remedy text.
@@ -215,14 +295,18 @@ All endpoints are mounted from `backend/src/server.js`.
   - ML fields (`crop`, `disease`, `confidence`, `remedyKey`)
   - `recommendation` (bilingual remedy object if remedyKey is known)
 
-### 5.7 Chat
+Notes:
+- This endpoint is currently **not** auth-protected in the backend.
+- It depends on the FastAPI service at `ML_BASE_URL` and returns HTTP 502 if the ML service is unreachable.
+
+### 5.10 Chat
 **Endpoint:** `/chat`
 - **Method:** POST
 - **Purpose:** Rule-based bilingual chatbot reply.
 - **Input (JSON):** `{ message: string, language?: "en" | "pa" }`
 - **Output (JSON):** `{ reply, intent, language, meta }`
 
-### 5.8 Edge Status
+### 5.11 Edge Status
 **Endpoint:** `/edge/status`
 - **Method:** GET
 - **Purpose:** Check ML service reachability and return a demo “edge readiness” report.
@@ -234,18 +318,70 @@ All endpoints are mounted from `backend/src/server.js`.
 MongoDB.
 
 ### Collection names / models
-- `FarmerProfile` (collection name derived by Mongoose from model)
+- `FarmerAccount` (demo farmers)
+- `FarmerSession` (demo sessions; TTL)
+- `FarmerProfile` (single profile per farmer)
 - `SoilTest`
+- `Location` (Punjab location master list)
+- `Season` (master list)
+- `SoilType` (master list)
+- `Crop` (master list)
 
 ### Schema/models
+#### FarmerAccount
+File: `backend/src/models/FarmerAccount.js`
+- `name`: String (required, unique)
+- `email`: String (optional)
+- `phone`: String (optional)
+- `profileId`: ObjectId (ref `FarmerProfile`, required)
+
+#### FarmerSession
+File: `backend/src/models/FarmerSession.js`
+- `token`: String (required, unique)
+- `farmerId`: ObjectId (ref `FarmerAccount`, required)
+- `expiresAt`: Date (required)
+- TTL index on `expiresAt`
+
 #### FarmerProfile
 File: `backend/src/models/FarmerProfile.js`
+- `farmerId`: ObjectId (ref `FarmerAccount`, unique+sparse; may be missing for legacy profiles)
 - `name`: String
-- `location`: String (required)
-- `soilType`: String
-- `previousCrop`: String
-- `season`: String
+- `locationId`: ObjectId (ref `Location`, required)
+- `locationText`: String (legacy/backward-compat; optional)
+- `soilTypeId`: ObjectId (ref `SoilType`, optional)
+- `seasonId`: ObjectId (ref `Season`, optional)
+- `previousCropId`: ObjectId (ref `Crop`, optional)
+- `soilTypeText`, `seasonText`, `previousCropText`: legacy strings (optional)
 - timestamps: `createdAt`, `updatedAt`
+
+#### Season
+File: `backend/src/models/Season.js`
+- `code`: String (unique)
+- `name.en`, `name.pa`
+- `active`: Boolean
+
+#### SoilType
+File: `backend/src/models/SoilType.js`
+- `code`: String (unique)
+- `name.en`, `name.pa`
+- `active`: Boolean
+
+#### Crop
+File: `backend/src/models/Crop.js`
+- `code`: String (unique)
+- `name.en`, `name.pa`
+- `active`: Boolean
+
+#### Location
+File: `backend/src/models/Location.js`
+- `code`: String (unique)
+- `state`: String (default `Punjab`)
+- `type`: "district"
+- `name.en`: String
+- `name.pa`: String
+- `center.lat`, `center.lon`: Number (district centroid)
+- `active`: Boolean
+- timestamps
 
 #### SoilTest
 File: `backend/src/models/SoilTest.js`
@@ -258,6 +394,12 @@ File: `backend/src/models/SoilTest.js`
 - timestamps: `createdAt`, `updatedAt`
 
 ### Relationships
+- One `FarmerAccount` → exactly one `FarmerProfile` (linked via `FarmerAccount.profileId`).
+- One `FarmerAccount` → many `FarmerSession` records (active tokens).
+- One `Location` → many `FarmerProfile` records (linked via `FarmerProfile.locationId`).
+- One `Season` → many `FarmerProfile` records (linked via `FarmerProfile.seasonId`).
+- One `SoilType` → many `FarmerProfile` records (linked via `FarmerProfile.soilTypeId`).
+- One `Crop` → many `FarmerProfile` records (linked via `FarmerProfile.previousCropId`).
 - One `FarmerProfile` → many `SoilTest` records (linked via `SoilTest.profileId`).
 
 ### Sample record structure
@@ -265,13 +407,27 @@ FarmerProfile:
 ```json
 {
   "_id": "<ObjectId>",
-  "location": "Ludhiana",
+  "locationId": "<Location ObjectId>",
+  "locationText": "<optional legacy string>",
   "name": "<optional>",
-  "soilType": "<optional>",
-  "previousCrop": "<optional>",
-  "season": "<optional>",
+  "soilTypeId": "<optional SoilType ObjectId>",
+  "previousCropId": "<optional Crop ObjectId>",
+  "seasonId": "<optional Season ObjectId>",
   "createdAt": "<ISO date>",
   "updatedAt": "<ISO date>"
+}
+```
+
+Location:
+```json
+{
+  "_id": "<ObjectId>",
+  "code": "pb_ludhiana",
+  "state": "Punjab",
+  "type": "district",
+  "name": { "en": "Ludhiana", "pa": "ਲੁਧਿਆਣਾ" },
+  "center": { "lat": 30.901, "lon": 75.8573 },
+  "active": true
 }
 ```
 SoilTest:
@@ -320,33 +476,44 @@ Dummy/deterministic: always returns the same disease response.
 
 ## 8. Data Flow (End-to-End)
 ### Step-by-step data movement
-1. **UI → Backend (Profile):** user submits profile form → `POST /profiles` → stored in MongoDB.
-2. **UI → Backend (Soil):** user selects profile and submits N/P/K/pH → `POST /soil-tests` → stored in MongoDB.
-3. **UI → Backend (Crop recommendation):** UI calls `GET /recommendations/crop?profileId=...`.
+1. **UI → Backend (Login):** user selects demo farmer → `POST /login` → frontend stores token.
+2. **UI → Backend (Profile):** UI loads/updates current profile via `GET /me/profile` and `PUT /me/profile`.
+3. **UI → Backend (Soil):** UI submits N/P/K/pH → `POST /soil-tests` (auth required) → stored in MongoDB.
+4. **UI → Backend (Crop recommendation):** UI calls `GET /recommendations/crop` (auth required).
    - Backend loads profile and latest soil test.
-   - Backend resolves location to lat/lon (Punjab lookup).
+   - Backend uses `Location.center` lat/lon for the profile.
    - Backend optionally fetches weather forecast + builds alerts.
    - Backend returns rule-based crop recommendations.
-4. **UI → Backend (Fertilizer guidance):** UI calls `GET /recommendations/fertilizer?profileId=...&crop=...`.
+5. **UI → Backend (Fertilizer guidance):** UI calls `GET /recommendations/fertilizer?crop=...` (auth required).
    - Backend loads latest soil test.
    - Backend returns rule-based fertilizer guidance.
-5. **UI → Backend → ML → Backend → UI (Disease):** UI uploads image → `POST /disease/predict`.
+6. **UI → Backend → ML → Backend → UI (Disease):** UI uploads image → `POST /disease/predict`.
    - Backend forwards the file to ML service `/predict-disease`.
    - ML returns stubbed prediction JSON.
    - Backend enriches with remedy text and returns to UI.
-6. **UI → Backend → Open-Meteo (Weather):** UI calls `GET /weather/forecast?lat=...&lon=...`.
+7. **UI → Backend → Open-Meteo (Weather):** UI calls `GET /weather/forecast/by-profile` (auth required).
+   - Backend resolves district centroid via `Location.center`.
    - Backend calls Open-Meteo and returns normalized forecast + alerts.
+
+Additional UI-supported flows:
+- **Assistant voice navigation:** `/assistant` uses browser speech recognition to navigate (and optionally speaks chatbot responses).
+- **Chatbot:** `/chat` is rule-based and bilingual.
+- **Edge status:** `/edge/status` checks ML health (`/health` on the ML service).
 
 ## 9. Limitations
 ### Technical limitations
-- No authentication/authorization.
+- Demo authentication only (session token; no real OTP/password).
 - Weather caching is in-memory only.
-- Location resolution is limited to a hardcoded Punjab mapping.
+- Location master data is currently limited to a seeded Punjab district list.
+
+Notes:
+- The current UI uses the **profile-based** weather flow (`/weather/forecast/by-profile`) and does not require manual lat/lon entry.
+- Weather still depends on external internet connectivity (Open-Meteo).
 
 ### Scope limitations (Review-01)
-- Crop recommendation scope is limited (rule-based, Wheat/Rice).
+- Crop recommendation scope is limited (rule-based, Wheat/Rice only).
 - Fertilizer guidance is heuristic.
-- Disease prediction is stubbed.
+- Disease prediction is stubbed (deterministic output from ML service).
 
 ### Academic simplifications
 - Deterministic rule-based logic is used for explainability.
@@ -454,8 +621,8 @@ _Source merged from former `UI_DATA_CONTRACTS.md`._
 **Shows** quick entry points to Profile, Soil, Crop, Fertilizer, Disease, Weather, plus placeholders for recent activity.
 
 ### B2) Farmer Profile Screen
-**Inputs:** name (optional), location (required), soil type (optional), previous crop (optional), season (optional/recommended).
-**Validation:** location required.
+**Inputs:** name (optional), Punjab district (required), soil type (optional), previous crop (optional), season (optional/recommended).
+**Validation:** locationId required.
 
 ### B3) Soil Input Screen (NPK / pH)
 **Inputs:** N, P, K, pH (required), test date (optional).
@@ -471,11 +638,11 @@ _Source merged from former `UI_DATA_CONTRACTS.md`._
 **Outputs:** NPK guidance, schedule, safety notes; missing-input notice.
 
 ### B6) Disease Detection Screen
-**Inputs:** crop type (optional), leaf image (required).
+**Inputs:** leaf image (required).
 **Outputs:** disease name, confidence, treatment recommendation, escalation/safety note; history later.
 
 ### B7) Weather Screen
-**Requires:** location.
+**Requires:** saved profile (district already selected during profile creation).
 **Outputs:** 7-day forecast and alerts area (rule-based).
 
 ### B8) Language Toggle
