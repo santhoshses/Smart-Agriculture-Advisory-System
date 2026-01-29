@@ -1,6 +1,6 @@
-# Smart Crop Advisory System (Demo) — Setup Guide for Reviewers
+# Smart Crop Advisory System (Demo) — Setup Guide for Students
 
-## 0) What this project is (end-to-end, in simple words)
+## 1) What this project is (end-to-end, in simple words)
 This is a **demo web application** for a **Smart Crop Advisory System** (Punjab only).
 
 It shows how a farmer-friendly advisory flow can work with **structured inputs** (profile + soil test) and **clear outputs** (crop suggestion, fertilizer guidance, weather).
@@ -17,32 +17,82 @@ It shows how a farmer-friendly advisory flow can work with **structured inputs**
 
 ---
 
-## 1) Before you start (very important)
+## 2) Prerequisites (install these first)
 This project has 2 parts running on your computer:
 - a **Backend server** (stores data in a database and provides APIs)
 - a **Frontend website** (the screens you click)
 
 To run them, you need these installed.
 
-### 1.1 What is Node.js and why do we need it?
-**Node.js** is a program that lets your computer run JavaScript outside the browser.
-We need Node.js because the **backend server** (and the frontend build tools) run using Node.js.
+### 2.1 Install Node.js (includes npm)
+**What it is (simple):** Node.js lets your computer run JavaScript programs.
 
-### 1.2 What is npm and why do we need it?
-**npm** comes with Node.js. It downloads the project’s required libraries.
-We use it to install dependencies and run commands like `npm run dev`.
+**Why you need it here:**
+- The backend server runs on Node.js
+- The frontend dev server runs on Node.js
 
-### 1.3 What is MongoDB and why do we need it?
-**MongoDB** is the database used by this project.
-It stores things like farmer profile, soil tests, and dropdown master data (districts, seasons, crops).
+**Install (Windows):**
+1) Download **Node.js LTS** from: https://nodejs.org/
+2) Run the installer → keep default options
+3) Verify installation:
+```bash
+node -v
+npm -v
+```
 
-### 1.4 Optional: Python (only for Disease Detection)
-The disease feature calls a small **Python service** (currently a stub). If you do not start it, the rest of the app still works.
+You should see version numbers.
+
+### 2.2 Install Git (for downloading the project)
+**What it is (simple):** Git is a tool to download code from GitHub.
+
+**Install (Windows):**
+1) Download Git from: https://git-scm.com/downloads
+2) Run the installer → default options are OK
+3) Verify:
+```bash
+git --version
+```
+
+### 2.3 Install MongoDB (database)
+**What it is (simple):** MongoDB is where the app stores data (profiles, soil tests, dropdown lists).
+
+**Install (Windows):**
+1) Download MongoDB Community Server: https://www.mongodb.com/try/download/community
+2) Install it
+3) Ensure MongoDB service is running
+
+> If you are not sure, you can still continue; the backend will clearly fail if MongoDB is not running.
+
+### 2.4 Optional: Install Python (only for Disease Detection)
+If you want to demo **Disease Detection**, you need Python.
+
+Download: https://www.python.org/downloads/
+
+During installation, tick: **“Add Python to PATH”**.
+
+Verify:
+```bash
+python --version
+```
 
 ---
 
-## 2) Step 1 — Download (clone) the project
-If you already have the project folder, you can skip this.
+## 3) Quickstart (run the project in 6 steps)
+If you just want to run the project quickly, follow this checklist:
+1) Start MongoDB
+2) Setup backend (`npm install`)
+3) Seed database (`npm run seed` + `npm run seed:demo`)
+4) Run backend (`npm run dev`)
+5) Setup frontend (`npm install`)
+6) Run frontend (`npm run dev`)
+
+Then open: **http://127.0.0.1:5173/**
+
+---
+
+## 4) Step-by-step Setup
+
+### 4.1 Download (clone) the project
 
 1) Open **Terminal / Command Prompt / PowerShell**
 2) Run:
@@ -59,7 +109,7 @@ cd Smart-Agriculture-Advisory-System
 
 ---
 
-## 3) Step 2 — Start MongoDB (database)
+### 4.2 Start MongoDB (database)
 MongoDB must be running **before** you start the backend.
 
 If MongoDB is not running:
@@ -70,7 +120,7 @@ If MongoDB is not running:
 
 ---
 
-## 4) Step 3 — Backend setup (server)
+### 4.3 Backend setup (server)
 The backend is inside the `backend/` folder.
 
 1) Install backend dependencies:
@@ -99,7 +149,7 @@ Quick check:
 
 ---
 
-## 5) Step 4 — Frontend setup (website UI)
+### 4.4 Frontend setup (website UI)
 Open a **second terminal window** for the frontend.
 
 1) Install frontend dependencies:
@@ -118,7 +168,7 @@ Frontend should run at:
 
 ---
 
-## 6) Step 5 — Login and run the end-to-end flow
+### 4.5 Login and run the end-to-end flow
 1) Open **http://127.0.0.1:5173/** in your browser
 2) You will be redirected to **/login**
 3) Select a demo farmer (example: **Demo Farmer 1**) and login
@@ -127,7 +177,7 @@ Frontend should run at:
 
 ---
 
-## 7) Environment variables (simple explanation)
+## 5) Environment variables (simple explanation)
 ### What is an environment variable?
 An **environment variable** is a small **setting** you give to a program when you start it.
 It tells the app things like:
@@ -173,7 +223,7 @@ $env:ML_BASE_URL = "http://127.0.0.1:8001"
 
 ---
 
-## 8) Seeding the database (CRITICAL)
+## 6) Seeding the database (CRITICAL)
 ### What is “seeding”?
 Seeding means: **pre-filling the database with required starting data**.
 
@@ -210,7 +260,7 @@ Yes. These seed scripts are designed to be **repeatable** (they do not keep dupl
 
 ---
 
-## 9) Optional: Start the ML service (only for Disease Detection)
+## 7) Optional: Start the ML service (only for Disease Detection)
 If you want to demo **Disease Detection**, start the Python service.
 
 1) Open a third terminal window:
@@ -246,7 +296,7 @@ Check:
 
 ---
 
-## 10) Quick verification checklist (for invigilators)
+## 8) Quick verification checklist (for students)
 - MongoDB is running
 - Backend:
   - http://localhost:5000/health returns `{ "status": "ok" }`
@@ -256,7 +306,7 @@ Check:
 
 ---
 
-## 11) Demo walkthrough (short)
+## 9) Demo walkthrough (short)
 Suggested demo flow (safe and repeatable):
 1) Login as **Demo Farmer 1**
 2) Profile: set name to `Harpreet Singh (Demo)` → Save
