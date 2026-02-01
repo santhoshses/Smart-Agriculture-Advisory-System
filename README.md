@@ -85,22 +85,82 @@ This project has 2 main parts running on your computer:
 To run them, you need these installed.
 
 ### Install Node.js (includes npm)
-**What it is (simple):** Node.js lets your computer run JavaScript programs.
 
-Verify installation:
+**Recommended version:** Node.js **20 LTS** (or newer LTS).  
+**Why:** Backend uses Express 5 and Mongoose 8, which work best on modern Node LTS.
+
+**Download (official):** https://nodejs.org/en/download
+
+**Install steps (Windows 10/11):**
+1) Download **Node.js 20 LTS (Windows Installer .msi)**
+2) Run the installer → keep default options
+3) Ensure these are enabled:
+   - “Add to PATH”
+   - npm installation
+4) Close and reopen Terminal / PowerShell
+5) Verify:
+
 ```bash
 node -v
 npm -v
 ```
 
-### Install Git (for downloading the project)
-Verify:
+Expected:
+- Node version should start with `v20.` (or another LTS version you installed)
+
+---
+
+### Install Git (for cloning/downloading the project)
+
+**Recommended version:** Git **2.40+**
+
+**Download (official):** https://git-scm.com/downloads
+
+**Install steps (Windows 10/11):**
+1) Download **Git for Windows**
+2) Run the installer
+3) Keep defaults (important ones):
+   - “Git from the command line and also from 3rd-party software”
+   - Default editor can be anything
+4) Close and reopen Terminal / PowerShell
+5) Verify:
+
 ```bash
 git --version
 ```
 
-### Install MongoDB (database)
-MongoDB must be running before you start the backend.
+---
+
+### Install MongoDB Community Server (database)
+
+**Recommended version:** MongoDB Community Server **7.0+**
+
+**Download (official):** https://www.mongodb.com/try/download/community
+
+**Install steps (Windows 10/11):**
+1) Choose:
+   - **Version:** 7.0.x (latest available)
+   - **Package:** MSI
+   - **Platform:** Windows
+2) Run the installer
+3) Choose **Complete** setup
+4) Keep “Install MongoDB as a Service” enabled (recommended for students)
+5) Finish installation
+
+**Verify MongoDB service is running:**
+- Open **Services** → find **MongoDB Server** → Status should be *Running*
+
+**Optional verification (MongoDB Shell):**
+- Install MongoDB Shell from: https://www.mongodb.com/try/download/shell
+- Then run:
+
+```bash
+mongosh
+```
+
+If MongoDB is not running:
+- backend will fail to start
+- login dropdown and master-data dropdowns will be empty
 
 ---
 
