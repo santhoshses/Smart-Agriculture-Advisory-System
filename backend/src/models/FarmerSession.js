@@ -7,7 +7,9 @@ const FarmerSessionSchema = new mongoose.Schema(
   {
     token: { type: String, required: true, unique: true, index: true },
     farmerId: { type: mongoose.Schema.Types.ObjectId, ref: "FarmerAccount", required: true, index: true },
-    expiresAt: { type: Date, required: true, index: true },
+    // TTL index is defined below using schema.index(..., { expireAfterSeconds: 0 })
+    // so we do NOT also set `index: true` here (avoids duplicate-index warning).
+    expiresAt: { type: Date, required: true },
   },
   { timestamps: true }
 );
@@ -15,4 +17,3 @@ const FarmerSessionSchema = new mongoose.Schema(
 FarmerSessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model("FarmerSession", FarmerSessionSchema);
-

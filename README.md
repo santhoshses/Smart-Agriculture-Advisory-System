@@ -86,7 +86,7 @@ If you just want to run the project quickly, follow this checklist:
 5) Setup frontend (`npm install`)
 6) Run frontend (`npm run dev`)
 
-Then open: **http://127.0.0.1:5173/**
+Then open: **http://localhost:5173/**
 
 ---
 
@@ -164,12 +164,12 @@ npm run dev
 ```
 
 Frontend should run at:
-- **http://127.0.0.1:5173/**
+- **http://localhost:5173/**
 
 ---
 
 ### 4.5 Login and run the end-to-end flow
-1) Open **http://127.0.0.1:5173/** in your browser
+1) Open **http://localhost:5173/** in your browser
 2) You will be redirected to **/login**
 3) Select a demo farmer (example: **Demo Farmer 1**) and login
 4) Continue the flow:
@@ -203,8 +203,8 @@ Only set them if:
 
 Defaults (if you do nothing):
 - `PORT=5000`
-- `MONGODB_URI=mongodb://127.0.0.1:27017/smart_crop_advisory`
-- `ML_BASE_URL=http://127.0.0.1:8001`
+- `MONGODB_URI=mongodb://localhost:27017/smart_crop_advisory`
+- `ML_BASE_URL=http://localhost:8001`
 
 #### Frontend variable
 | Variable | What it controls | Do I need to set it? | When would I change it? |
@@ -217,8 +217,8 @@ Default:
 PowerShell example (optional):
 ```powershell
 $env:PORT = "5000"
-$env:MONGODB_URI = "mongodb://127.0.0.1:27017/smart_crop_advisory"
-$env:ML_BASE_URL = "http://127.0.0.1:8001"
+$env:MONGODB_URI = "mongodb://localhost:27017/smart_crop_advisory"
+$env:ML_BASE_URL = "http://localhost:8001"
 ```
 
 ---
@@ -288,11 +288,11 @@ pip install -r requirements.txt
 
 4) Run the service:
 ```bash
-uvicorn app:app --host 127.0.0.1 --port 8001
+uvicorn app:app --host localhost --port 8001
 ```
 
 Check:
-- **http://127.0.0.1:8001/health** should return `{ "status": "ok" }`
+- **http://localhost:8001/health** should return `{ "status": "ok" }`
 
 ---
 
@@ -301,8 +301,14 @@ Check:
 - Backend:
   - http://localhost:5000/health returns `{ "status": "ok" }`
 - Frontend:
-  - http://127.0.0.1:5173/ opens and redirects to `/login`
+  - http://localhost:5173/ opens and redirects to `/login`
   - Login dropdown shows **Demo Farmer 1/2/3**
+
+---
+
+### Note about `localhost` vs `127.0.0.1`
+Both usually mean “this same computer”.
+If one does not work on your laptop, try the other.
 
 ---
 
