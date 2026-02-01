@@ -474,6 +474,10 @@ Dummy/deterministic: always returns the same disease response.
 - No model inference logic is present.
 - No multiple disease classes are implemented.
 
+### Voice bot / chatbot clarification (current implementation)
+- The **Voice Bot** is browser-based and uses Web Speech APIs (SpeechRecognition + SpeechSynthesis).
+- The **Chatbot** is rule-based (predefined keywords + fixed bilingual templates). There is **no AI/LLM**.
+
 ## 8. Data Flow (End-to-End)
 ### Step-by-step data movement
 1. **UI → Backend (Login):** user selects demo farmer → `POST /login` → frontend stores token.
@@ -511,7 +515,7 @@ Notes:
 - Weather still depends on external internet connectivity (Open-Meteo).
 
 ### Scope limitations (Review-01)
-- Crop recommendation scope is limited (rule-based, Wheat/Rice only).
+- Crop recommendation scope is limited (rule-based, Punjab-focused, 8 crops).
 - Fertilizer guidance is heuristic.
 - Disease prediction is stubbed (deterministic output from ML service).
 
@@ -523,7 +527,7 @@ Notes:
 ### Non-ML improvements
 - Improve farmer location handling (beyond the current lookup table).
 - Improve input validation and user guidance.
-- Expand crop coverage beyond Wheat/Rice.
+- Expand crop coverage beyond the current Punjab demo crop set.
 
 ### ML improvements
 - Replace stubbed prediction with a real model.

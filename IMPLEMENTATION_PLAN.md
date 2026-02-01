@@ -41,7 +41,7 @@ Status note:
 
 ## Step 0.1 — Confirm demo scope and success criteria
 **What will be built**
-- A written scope checklist for Review-01: crops (Wheat, Rice), disease categories (3–5 per crop), and the exact user flows to demonstrate.
+- A written scope checklist for Review-01: crop set (Punjab demo crop list), disease categories (3–5 per crop), and the exact user flows to demonstrate.
 
 **Why this step exists**
 - Prevent scope creep and ensure the demo is review-ready.
@@ -224,12 +224,14 @@ Status note:
 ## Step 2.2 — Database modeling and persistence layer
 **What will be built**
 - MongoDB collections design (conceptual level):
-  - farmer profiles
+  - farmer profile + master data references
   - soil test records
-  - crop advisory results
-  - fertilizer plans
-  - disease scan history
-  - weather cache (short-lived)
+  - demo login sessions
+
+Implementation note (current codebase):
+- Crop recommendations and fertilizer guidance are **computed on demand** (not stored as “history tables”).
+- Weather cache is **in-memory** inside the backend process (not stored in MongoDB).
+- Disease scan results are **not persisted** (the UI shows the response only).
 
 **Why this step exists**
 - You need persistence before you can trust outputs across sessions.
@@ -288,7 +290,8 @@ Status note:
 
 **Status:** ✅ Implemented
 - Rule engine implemented in `backend/src/services/cropRecommendationService.js`.
-- Current crop scope is intentionally limited to **Wheat** and **Rice**.
+- Current crop scope (as implemented in `CROP_CONFIG`) includes **8 Punjab-relevant crops**:
+  - wheat, rice, maize, cotton, barley, mustard, moong, sunflower
 
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**

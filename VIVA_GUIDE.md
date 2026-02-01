@@ -733,6 +733,10 @@ Line-by-line:
 - But internet may not be available.
 - So the system can work even without weather.
 
+Important clarification (as implemented today):
+- The scoring service supports “no weather” cases, but the current `/recommendations/crop` route usually tries to fetch weather when a location is available.
+- So if Open-Meteo is down, crop recommendation can fail for that request.
+
 ## 3. Real-World Analogy (if helpful)
 Planning a trip:
 - If you have weather forecast, you plan better.
@@ -967,4 +971,3 @@ Line-by-line:
 ## Final confidence note (for students)
 If you get stuck in viva, say this calmly:
 > “This is a rule-based demo system. It stores soil tests in MongoDB, then scores crops using clear +/− points, and gives fertilizer guidance by classifying N/P/K as low/normal/high.”
-
