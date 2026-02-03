@@ -40,19 +40,59 @@ The project demonstrates how farm advisory workflows can be built using a web UI
 - ML service: `http://127.0.0.1:8001` (default `ML_BASE_URL`)
 - Protocols: REST/HTTP between services; HTTPS to Open-Meteo.
 
-### Text-based architecture diagram
+### Text-based architecture diagram (end-to-end)
+
+This diagram reflects the **current implementation**, including Voice Bot and rule-based Chatbot.
+
 ```
-React Frontend (5173)
-  |
-  | HTTP REST
-  v
-Node/Express Backend (5000)
-  |\
-  | \-- MongoDB (smart_crop_advisory)
-  |
-  |---- HTTP --> ML FastAPI (8001)
-  |
-  \---- HTTPS --> Open-Meteo API
+┌───────────────────────────────────────────────┐
+│                 User (Farmer)                 │
+│   Uses UI in English/Punjabi + optional Voice │
+└───────────────────────────────┬───────────────┘
+                                │
+                                │ Browser (Chrome recommended)
+                                │
+                                │ 1) SpeechRecognition (voice → text) [optional]
+                                │ 2) SpeechSynthesis (text → voice) [optional]
+                                v
+┌───────────────────────────────────────────────┐
+│           React Frontend (Vite Dev)           │
+│                 http://127.0.0.1:5173         │
+│  Pages: /login, /profile, /soil, /crop, ...   │
+│  i18n: frontend/src/i18n (en + pa dictionaries)│
+└───────────────────────────────┬───────────────┘
+                                │
+                                │ HTTP REST + JSON
+                                │ Authorization: Bearer <token>
+                                v
+┌───────────────────────────────────────────────┐
+│            Node/Express Backend API           │
+│               http://localhost:5000           │
+│  Routes: /me, /soil-tests, /recommendations,  │
+│         /weather, /disease, /chat, /edge       │
+└───────────────┬─────────────────────┬─────────┘
+                │                     │
+                │ Mongoose            │ HTTP (optional)
+                v                     v
+┌───────────────────────────────┐   ┌───────────────────────────────┐
+│          MongoDB Database      │   │     ML Service (FastAPI stub)  │
+│  smart_crop_advisory           │   │     http://127.0.0.1:8001      │
+│  Stores: profiles, soil tests, │   │  Endpoint: POST /predict-disease│
+│  sessions, masters (Location..)│   │  Returns deterministic JSON     │
+└───────────────────────────────┘   └───────────────────────────────┘
+                │
+                │ HTTPS (internet required)
+                v
+┌───────────────────────────────────────────────┐
+│            Open-Meteo Weather API             │
+│        https://api.open-meteo.com/...         │
+│  Backend normalizes forecast + builds alerts  │
+└───────────────────────────────────────────────┘
+
+Notes:
+- Crop & fertilizer recommendations are computed in backend services (rule-based).
+- Chatbot replies are template-based (rule-based). No AI/LLM.
+- Voice audio is not uploaded/stored; only transcript text is used.
 ```
 
 ## 3. Frontend Details
