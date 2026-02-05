@@ -89,24 +89,6 @@ export default function CropRecommendationPage() {
     return nm;
   };
 
-  const renderWeatherSummary = () => {
-    const w = result?.used?.weather;
-    if (!w) return null;
-    const alertsCount = Array.isArray(w.alerts) ? w.alerts.length : 0;
-    return (
-      <div className="card">
-        <h2 className="sectionTitle">{t("cropWeatherUsed")}</h2>
-        <div className="chips">
-          <span className={`chip ${alertsCount > 0 ? "chipWarn" : "chipOk"}`}>
-            {t("cropAlerts")}: {alertsCount}
-          </span>
-          <span className="chip">Lat: {w.location?.lat ?? "-"}</span>
-          <span className="chip">Lon: {w.location?.lon ?? "-"}</span>
-        </div>
-      </div>
-    );
-  };
-
   const renderRecommendations = () => {
     const items = Array.isArray(result?.recommendations) ? result.recommendations : [];
     if (items.length === 0) {
@@ -157,15 +139,7 @@ export default function CropRecommendationPage() {
           <NavLink className="ctaLink" to="/fertilizer">
             {t("commonNext")}: {t("navFertilizer")}
           </NavLink>
-          <NavLink className="ctaLink" to="/weather">
-            {t("commonView")}: {t("navWeather")}
-          </NavLink>
         </div>
-
-        <details style={{ marginTop: 12 }}>
-          <summary>{t("commonRawJson")}</summary>
-          <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(result, null, 2)}</pre>
-        </details>
       </div>
     );
   };
@@ -245,15 +219,11 @@ export default function CropRecommendationPage() {
         <div className="card">
           <strong>{t("cropErrorFetch")}</strong>
           <div className="muted">{String(error.message || error)}</div>
-          {error.data ? (
-            <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(error.data, null, 2)}</pre>
-          ) : null}
         </div>
       ) : null}
 
       {result ? (
         <>
-          {renderWeatherSummary()}
           {renderRecommendations()}
         </>
       ) : null}

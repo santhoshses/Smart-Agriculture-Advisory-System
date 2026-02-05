@@ -161,11 +161,6 @@ export default function SoilInputPage() {
               Next: {t("navFertilizer")}
             </NavLink>
           </div>
-
-          <details style={{ marginTop: 12 }}>
-            <summary>Raw JSON</summary>
-            <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(saved, null, 2)}</pre>
-          </details>
         </div>
       ) : null}
     </div>

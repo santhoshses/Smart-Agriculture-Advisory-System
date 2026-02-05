@@ -5,7 +5,6 @@ const { connectToDatabase } = require("./db/connect");
 const profileRoutes = require("./routes/profileRoutes");
 const soilTestRoutes = require("./routes/soilTestRoutes");
 const recommendationRoutes = require("./routes/recommendationRoutes");
-const diseaseRoutes = require("./routes/diseaseRoutes");
 const weatherRoutes = require("./routes/weatherRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const edgeRoutes = require("./routes/edgeRoutes");
@@ -51,9 +50,6 @@ app.use("/soil-tests", soilTestRoutes);
 
 // Advisory routes (Phase 3)
 app.use("/recommendations", recommendationRoutes);
-
-// Disease routes (Phase 4)
-app.use("/disease", diseaseRoutes);
 
 // Weather routes (Phase 5)
 app.use("/weather", weatherRoutes);

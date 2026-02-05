@@ -156,18 +156,10 @@ export default function FertilizerGuidancePage() {
         </div>
 
         <div className="ctaRow">
-          <NavLink className="ctaLink" to="/weather">
-            {t("commonView")}: {t("navWeather")}
-          </NavLink>
-          <NavLink className="ctaLink" to="/disease">
-            {t("commonView")}: {t("navDisease")}
+          <NavLink className="ctaLink" to="/crop">
+            {t("commonView")}: {t("navCrop")}
           </NavLink>
         </div>
-
-        <details style={{ marginTop: 12 }}>
-          <summary>{t("commonRawJson")}</summary>
-          <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(result, null, 2)}</pre>
-        </details>
       </div>
     );
   };
@@ -252,9 +244,6 @@ export default function FertilizerGuidancePage() {
         <div className="card">
           <strong>{t("fertErrorFetch")}</strong>
           <div className="muted">{String(error.message || error)}</div>
-          {error.data ? (
-            <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(error.data, null, 2)}</pre>
-          ) : null}
         </div>
       ) : null}
 

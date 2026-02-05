@@ -56,33 +56,12 @@ function Icon({ name }) {
     );
   }
 
-  if (name === "weather") {
-    return (
-      <svg {...common}>
-        <path {...s} d="M6 15a4 4 0 1 1 2-7.5A5 5 0 1 1 18 15H6Z" />
-        <path {...s} d="M8 19h.01" />
-        <path {...s} d="M12 19h.01" />
-        <path {...s} d="M16 19h.01" />
-      </svg>
-    );
-  }
-
   if (name === "disease") {
     return (
       <svg {...common}>
         <path {...s} d="M20 7c-4 0-8 4-8 8 4 0 8-4 8-8Z" />
         <path {...s} d="M4 7c4 0 8 4 8 8-4 0-8-4-8-8Z" />
         <path {...s} d="M12 15v7" />
-      </svg>
-    );
-  }
-
-  if (name === "chat") {
-    return (
-      <svg {...common}>
-        <path {...s} d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" />
-        <path {...s} d="M8 9h8" />
-        <path {...s} d="M8 13h6" />
       </svg>
     );
   }
@@ -125,9 +104,6 @@ export default function DashboardPage() {
       { to: "/profile", icon: "profile", title: t("dashActionProfile"), desc: t("dashFlow1Body") },
       { to: "/soil", icon: "soil", title: t("dashActionSoil"), desc: t("dashFlow2Body") },
       { to: "/crop", icon: "crop", title: t("dashActionCrop"), desc: t("dashFlow3Body") },
-      { to: "/weather", icon: "weather", title: t("dashActionWeather"), desc: t("dashFlow5Body") },
-      { to: "/disease", icon: "disease", title: t("dashActionDisease"), desc: t("pageDiseaseBody") },
-      { to: "/chat", icon: "chat", title: t("dashActionChat"), desc: t("pageChatBody") },
     ],
     [t]
   );
@@ -140,7 +116,6 @@ export default function DashboardPage() {
 
         <div className="heroMeta">
           <span className="pill">{t("dashPillBilingual")}</span>
-          <span className="pill">{t("dashPillVoice")}</span>
           <span className="pill pillGreen">{t("dashPillEdge")}</span>
         </div>
 
@@ -165,11 +140,6 @@ export default function DashboardPage() {
             <div className="flowNum">4</div>
             <div className="flowLabel">{t("dashFlow4Title")}</div>
             <p className="flowHelp">{t("dashFlow4Body")}</p>
-          </div>
-          <div className="flowStep">
-            <div className="flowNum">5</div>
-            <div className="flowLabel">{t("dashFlow5Title")}</div>
-            <p className="flowHelp">{t("dashFlow5Body")}</p>
           </div>
         </div>
       </div>
@@ -210,20 +180,17 @@ export default function DashboardPage() {
         ) : null}
 
         {edge ? (
-          <>
-            <div style={{ marginTop: 10 }}>
-              {edge?.services?.mlService?.reachable ? (
-                <div><strong>{t("edgeMlReachable")}</strong></div>
-              ) : (
-                <div><strong>{t("edgeMlUnreachable")}</strong></div>
-              )}
-            </div>
-
-            <details style={{ marginTop: 10 }}>
-              <summary>{t("edgeShowDetails")}</summary>
-              <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(edge, null, 2)}</pre>
-            </details>
-          </>
+          <div style={{ marginTop: 10 }}>
+            {edge?.services?.mlService?.reachable ? (
+              <div>
+                <strong>{t("edgeMlReachable")}</strong>
+              </div>
+            ) : (
+              <div>
+                <strong>{t("edgeMlUnreachable")}</strong>
+              </div>
+            )}
+          </div>
         ) : null}
       </div>
     </div>

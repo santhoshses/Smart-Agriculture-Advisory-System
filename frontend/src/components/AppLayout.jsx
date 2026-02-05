@@ -28,10 +28,6 @@ export default function AppLayout({ language, onToggleLanguage }) {
           <NavLink to="/soil">{t("navSoil")}</NavLink>
           <NavLink to="/crop">{t("navCrop")}</NavLink>
           <NavLink to="/fertilizer">{t("navFertilizer")}</NavLink>
-          <NavLink to="/disease">{t("navDisease")}</NavLink>
-          <NavLink to="/weather">{t("navWeather")}</NavLink>
-          <NavLink to="/assistant">{t("navAssistant")}</NavLink>
-          <NavLink to="/chat">{t("navChat")}</NavLink>
         </nav>
 
         <main className="content">

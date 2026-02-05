@@ -6,14 +6,10 @@ import AppLayout from "./components/AppLayout";
 import { I18nProvider } from "./i18n/I18nContext";
 import CropRecommendationPage from "./pages/CropRecommendationPage";
 import DashboardPage from "./pages/DashboardPage";
-import DiseaseDetectionPage from "./pages/DiseaseDetectionPage";
 import FertilizerGuidancePage from "./pages/FertilizerGuidancePage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ProfilePage from "./pages/ProfilePage";
 import SoilInputPage from "./pages/SoilInputPage";
-import AssistantPage from "./pages/AssistantPage";
-import WeatherPage from "./pages/WeatherPage";
-import ChatbotPage from "./pages/ChatbotPage";
 import LoginPage from "./pages/LoginPage";
 import { getAuthToken } from "./api/client";
 
@@ -57,10 +53,6 @@ export default function App() {
           <Route path="/soil" element={<SoilInputPage />} />
           <Route path="/crop" element={<CropRecommendationPage />} />
           <Route path="/fertilizer" element={<FertilizerGuidancePage />} />
-          <Route path="/disease" element={<DiseaseDetectionPage />} />
-          <Route path="/weather" element={<WeatherPage />} />
-          <Route path="/assistant" element={<AssistantPage />} />
-          <Route path="/chat" element={<ChatbotPage />} />
 
           <Route path="/dashboard" element={<Navigate to="/" replace />} />
           <Route path="*" element={<NotFoundPage />} />
