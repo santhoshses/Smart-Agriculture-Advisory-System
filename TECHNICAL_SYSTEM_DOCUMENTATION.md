@@ -11,21 +11,24 @@ Provide a Review-01 level “Smart Crop Advisory” demo system with:
 - Rule-based crop recommendation
 - Rule-based fertilizer guidance
 - 7-day weather forecast + simple alerts
-- Disease scan flow (image upload) integrated with a local ML service (currently stub)
+- Disease scan flow (image upload) integrated with a local ML service (Rice leaf disease classifier)
 - English + Punjabi UI
 
 ### Target users
 Small and marginal farmers; low digital literacy considered.
 
 ### Real-world relevance
-The project demonstrates how farm advisory workflows can be built using a web UI, a backend API, and external data sources (weather), with a placeholder for ML-based disease inference.
+The project demonstrates how farm advisory workflows can be built using a web UI, a backend API, and external data sources (weather), with **Rice-only disease detection** implemented using a pre-trained image classifier (HF Rice model).
+
+Disease model scope (as implemented):
+- Rice-only (5 classes): Bacterialblight, Blast, Brownspot, Healthy, Tungro.
 
 ## 2. System Architecture
 ### Overall architecture (Frontend, Backend, ML, Database)
 - **Frontend:** React (Vite) SPA in `frontend/`
 - **Backend:** Node.js + Express REST API in `backend/`
 - **Database:** MongoDB (via Mongoose models)
-- **ML service:** Python FastAPI in `ml-service/` (stub inference)
+- **ML service:** Python FastAPI in `ml-service/` (Rice leaf disease pre-trained classifier; local model files)
 - **External weather provider:** Open-Meteo public API (called by backend)
 
 ### Communication flow
@@ -75,10 +78,10 @@ This diagram reflects the **current implementation**, including Voice Bot and ru
                 │ Mongoose            │ HTTP (optional)
                 v                     v
 ┌───────────────────────────────┐   ┌───────────────────────────────┐
-│          MongoDB Database      │   │     ML Service (FastAPI stub)  │
+│          MongoDB Database      │   │   ML Service (FastAPI, Rice)   │
 │  smart_crop_advisory           │   │     http://127.0.0.1:8001      │
 │  Stores: profiles, soil tests, │   │  Endpoint: POST /predict-disease│
-│  sessions, masters (Location..)│   │  Returns deterministic JSON     │
+│  sessions, masters (Location..)│   │  Returns { crop,disease,conf,..}│
 └───────────────────────────────┘   └───────────────────────────────┘
                 │
                 │ HTTPS (internet required)
@@ -486,7 +489,11 @@ SoilTest:
 
 ## 7. Machine Learning Module
 ### Current ML status
-Stubbed (dummy output).
+Implemented for Disease Detection using a **pre-trained Rice leaf disease image classifier**.
+
+Scope note:
+- Disease module is **Rice-only** (Punjab-aligned demo scope).
+- Crop recommendation and fertilizer guidance remain rule-based (not ML).
 
 ### Service architecture
 - FastAPI app in `ml-service/app.py`.
@@ -495,24 +502,39 @@ Stubbed (dummy output).
   - `GET /health`
   - `POST /predict-disease`
 
+Model files:
+- Stored locally under `ml-service/models/rice_model/` (gitignored).
+- Loaded with `local_files_only=True` (no runtime download).
+
 ### Input/output format
 - **Input:** multipart/form-data `image` file.
 - **Output:**
 ```json
 {
-  "crop": "wheat",
-  "disease": "leaf_rust",
-  "confidence": 0.78,
-  "remedyKey": "wheat_leaf_rust_basic"
+  "crop": "rice",
+  "disease": "Blast",
+  "confidence": 0.91,
+  "remedyKey": "rice_blast_basic"
+}
+```
+
+Low-confidence fallback (threshold controlled by `CONF_THRESHOLD`, default 0.55):
+```json
+{
+  "crop": "rice",
+  "disease": "Unknown",
+  "confidence": 0.40,
+  "remedyKey": "rice_unknown_basic"
 }
 ```
 
 ### Predictions: real or dummy
-Dummy/deterministic: always returns the same disease response.
+Real inference (CPU) using the locally downloaded Rice model.
 
 ### Limitations
-- No model inference logic is present.
-- No multiple disease classes are implemented.
+- Disease classifier is **Rice-only** (5 classes).
+- Output is based on a pre-trained model; real-world accuracy depends on image quality.
+- The service uses a confidence threshold and returns **Unknown** when not confident.
 
 ### Voice bot / chatbot clarification (current implementation)
 - The **Voice Bot** is browser-based and uses Web Speech APIs (SpeechRecognition + SpeechSynthesis).
@@ -533,7 +555,7 @@ Dummy/deterministic: always returns the same disease response.
    - Backend returns rule-based fertilizer guidance.
 6. **UI → Backend → ML → Backend → UI (Disease):** UI uploads image → `POST /disease/predict`.
    - Backend forwards the file to ML service `/predict-disease`.
-   - ML returns stubbed prediction JSON.
+   - ML returns `{ crop, disease, confidence, remedyKey }`.
    - Backend enriches with remedy text and returns to UI.
 7. **UI → Backend → Open-Meteo (Weather):** UI calls `GET /weather/forecast/by-profile` (auth required).
    - Backend resolves district centroid via `Location.center`.
@@ -557,7 +579,7 @@ Notes:
 ### Scope limitations (Review-01)
 - Crop recommendation scope is limited (rule-based, Punjab-focused, 8 crops).
 - Fertilizer guidance is heuristic.
-- Disease prediction is stubbed (deterministic output from ML service).
+- Disease prediction is implemented only for Rice (5-class pre-trained model).
 
 ### Academic simplifications
 - Deterministic rule-based logic is used for explainability.
@@ -570,8 +592,7 @@ Notes:
 - Expand crop coverage beyond the current Punjab demo crop set.
 
 ### ML improvements
-- Replace stubbed prediction with a real model.
-- Add support for multiple crops/diseases.
+- Expand disease detection beyond rice (e.g., wheat) when suitable models/datasets are available; improve validation and real-field robustness.
 
 ---
 
@@ -618,7 +639,7 @@ This separation is intentional so that ML, weather, and UI can evolve independen
 #### ML Inference Service (Python)
 **Owns**
 - Image preprocessing (as required by the model)
-- Disease inference (either stub for Review-01 stability or real pre-trained model)
+- Disease inference using a pre-trained Rice leaf disease image classifier (Rice-only scope)
 - Returning structured prediction results (disease label + confidence)
 
 **Does NOT own**

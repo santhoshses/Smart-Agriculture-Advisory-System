@@ -96,7 +96,7 @@ Status note:
 - STOP once the architecture sheet is signed off.
 
 **Status:** ✅ Implemented
-- The current repo follows the described split: React frontend, Express backend, MongoDB, optional FastAPI ML stub, external weather.
+- The current repo follows the described split: React frontend, Express backend, MongoDB, FastAPI ML service (Rice-only inference), external weather.
 
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
@@ -364,7 +364,7 @@ Implementation note (current codebase):
 - STOP when the end-to-end “upload → prediction response” pipeline works with stub.
 
 **Status:** ✅ Implemented
-- FastAPI stub exists in `ml-service/app.py`.
+- FastAPI inference service exists in `ml-service/app.py` (Rice-only model).
 - Backend forwards uploads via `POST /disease/predict` to `ML_BASE_URL/predict-disease`.
 - Backend enriches response with bilingual remedy text.
 
@@ -380,7 +380,7 @@ Implementation note (current codebase):
 
 ## Step 4.2 — Replace stub with pre-trained model (if ready)
 **What will be built**
-- Connect a pre-trained PlantVillage-style model to the inference service.
+- Connect the pre-trained **Rice leaf disease** model (Hugging Face) to the inference service.
 - Add basic image preprocessing and confidence reporting.
 
 **Why this step exists**
@@ -399,8 +399,10 @@ Implementation note (current codebase):
 **Hard STOP point**
 - STOP when model predictions are consistent enough for demo.
 
-**Status:** ❌ Not implemented
-- ML service remains a deterministic stub.
+**Status:** ✅ Implemented (Rice-only)
+- ML service runs CPU inference using the locally downloaded Rice model.
+- Supported classes: Bacterialblight, Blast, Brownspot, Healthy, Tungro.
+- Low-confidence fallback returns `Unknown`.
 
 ### ⛔ STOP & REVIEW CHECKPOINT
 **Manually verify**
@@ -610,7 +612,7 @@ Implementation note (current codebase):
 # Final Review-01 Demo Checklist (must be true before submission)
 1. Demo login works: `/login` lists demo farmers and stores a token.
 2. UI flows complete: Profile → Soil → Crop → Fertilizer → Weather.
-3. Disease scan works end-to-end **only if** the ML service is running (stub) and returns remedy text.
+3. Disease scan works end-to-end **only if** the ML service is running (Rice model) and returns remedy text.
 4. Weather page shows 7-day forecast and alerts (internet required for Open-Meteo).
 5. Data persistence: profile and soil tests are saved and visible.
 6. Language toggle changes UI labels (advisory content is partially bilingual).

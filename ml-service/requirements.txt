@@ -2,3 +2,9 @@ fastapi==0.115.6
 uvicorn[standard]==0.34.0
 python-multipart==0.0.20
 
+# Inference deps (CPU)
+pillow==10.4.0
+numpy==1.26.4
+torch==2.3.1
+transformers==4.50.0
+safetensors==0.4.5

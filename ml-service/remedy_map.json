@@ -1,0 +1,8 @@
+{
+  "bacterialblight": "rice_bacterial_blight_basic",
+  "blast": "rice_blast_basic",
+  "brownspot": "rice_brown_spot_basic",
+  "tungro": "rice_tungro_basic",
+  "healthy": "rice_healthy_basic",
+  "unknown": "rice_unknown_basic"
+}
