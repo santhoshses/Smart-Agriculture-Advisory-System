@@ -45,7 +45,7 @@ Disease model scope (as implemented):
 
 ### Text-based architecture diagram (end-to-end)
 
-This diagram reflects the **current implementation**, including Voice Bot and rule-based Chatbot.
+This diagram reflects the **current implementation**, including the Voice Assistant and rule-based Chatbot.
 
 ```
 ┌───────────────────────────────────────────────┐
@@ -72,7 +72,7 @@ This diagram reflects the **current implementation**, including Voice Bot and ru
 │            Node/Express Backend API           │
 │               http://localhost:5000           │
 │  Routes: /me, /soil-tests, /recommendations,  │
-│         /weather, /disease, /chat, /edge       │
+│         /weather, /disease, /chat, /edge      │
 └───────────────┬─────────────────────┬─────────┘
                 │                     │
                 │ Mongoose            │ HTTP (optional)
@@ -128,7 +128,7 @@ Routes (from `frontend/src/App.jsx`):
 7. `/weather` — Weather
    - Fetch 7-day forecast + alerts for current farmer’s saved district (requires auth). Optional location override.
 8. `/assistant` — Assistant
-   - Guided navigation + voice mode (browser speech recognition). Can speak chatbot replies.
+   - Guided navigation + voice mode (browser speech recognition). Can also speak chatbot replies.
 9. `/chat` — Chatbot
    - Text input; gets rule-based response.
 10. `*` — Not Found
@@ -140,7 +140,7 @@ Typical demo flow:
 
 Note:
 - The frontend enforces demo login for all routes except `/login`.
-- Some backend endpoints are still public (e.g., `/chat`, `/edge/status`), but the current UI still requires login to reach those pages.
+- Some backend endpoints are public (e.g., `/chat`, `/edge/status`) for demo convenience.
 
 ## 4. Backend Details
 ### Technology stack
@@ -176,7 +176,7 @@ Validation notes (current):
 Notes:
 - `/login` UI uses `GET /farmers/demo` to populate the farmer dropdown.
 - Auth is enforced for: `/me/profile`, `/soil-tests`, `/recommendations/*`, `/weather/forecast/by-profile`.
-- Other endpoints like `/locations`, `/seasons`, `/soil-types`, `/crops`, `/chat`, `/edge/status` are public.
+Other endpoints like `/locations`, `/seasons`, `/soil-types`, `/crops`, `/chat`, `/edge/status` are public.
 
 ## 5. API Specification
 All endpoints are mounted from `backend/src/server.js`.
@@ -562,7 +562,7 @@ Real inference (CPU) using the locally downloaded Rice model.
    - Backend calls Open-Meteo and returns normalized forecast + alerts.
 
 Additional UI-supported flows:
-- **Assistant voice navigation:** `/assistant` uses browser speech recognition to navigate (and optionally speaks chatbot responses).
+- **Assistant voice navigation:** `/assistant` uses browser speech recognition to navigate (and can also speak chatbot replies).
 - **Chatbot:** `/chat` is rule-based and bilingual.
 - **Edge status:** `/edge/status` checks ML health (`/health` on the ML service).
 

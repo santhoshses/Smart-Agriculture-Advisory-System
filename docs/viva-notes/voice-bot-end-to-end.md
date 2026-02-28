@@ -5,8 +5,8 @@ This project’s **voice bot** is implemented as a **browser-based voice layer**
 It works in 4 stages:
 1) **Voice capture (microphone permission + listening)**
 2) **Speech → text** (browser Speech Recognition)
-3) **Text processing** (rule-based keyword matching in frontend + rule-based chatbot in backend)
-4) **Response back to user** (Text-to-Speech + optional page navigation)
+3) **Text processing** (rule-based keyword matching in frontend)
+4) **Response back to user** (Text-to-Speech + page navigation)
 
 ## Introductory clarification (important for viva)
 - The voice bot is **rule-based**.
@@ -81,7 +81,11 @@ rec.start();
 When speech is converted to text, the transcript is processed in **two places**:
 
 1) **Frontend keyword matching** (for quick navigation)
-2) **Backend rule-based chatbot** (for a short spoken answer)
+
+Important implementation note (current repo):
+The Assistant page can:
+- navigate using frontend keyword intents, and
+- optionally send the transcript to a **rule-based backend chatbot** for a short spoken reply.
 
 This is important for viva:
 - The processing is **keyword-based**, not “understanding the meaning”.
@@ -108,32 +112,20 @@ if (t.includes("crop") || t.includes("recommend") || t.includes("ਫਸਲ") || 
 if (t.includes("fertil") || t.includes("urea") || t.includes("npk") || t.includes("ਖਾਦ")) return "fertilizer";
 ```
 
-### 3.2 Backend: rule-based chatbot (limited Q&A)
+### 3.2 Backend chatbot (rule-based)
 
-**Where**:
-- API endpoint: `backend/src/routes/chatRoutes.js` (`POST /chat`)
-- Logic: `backend/src/services/chatbotService.js`
+The backend exposes a small rule-based endpoint:
+- `POST /chat` (JSON: `{ message, language }`)
 
-What it does:
-- The frontend sends `{ message, language }`.
-- Backend checks the message for known keywords.
-- It returns a **fixed template reply** (English or Punjabi).
+The Assistant can use this to speak a short reply after navigation acknowledgement.
 
 Key point:
-- This chatbot is **rule-based**.
-- It uses **predefined keywords + fixed templates**.
-- It is **not AI** and **not an LLM**.
-
-Backend code reference (idea):
-```js
-// backend/src/services/chatbotService.js
-if (t.includes("weather") || t.includes("rain") || t.includes("ਮੌਸਮ")) return "weather";
-return "unknown";
-```
+- It is **rule-based** (keywords + templates).
+- There is **no AI/LLM**.
 
 ---
 
-## 4) Backend Chatbot Capabilities and Predefined Keywords
+## 4) Supported voice commands (keywords)
 
 ### 4.1 Logical categorization (how to explain in viva)
 
@@ -142,16 +134,9 @@ These match the frontend keyword rules and will:
 - speak an acknowledgement, and
 - navigate to a feature page.
 
-#### B) Voice inputs that trigger **spoken answers only** (Backend)
-These are understood by the backend chatbot but **not** by the frontend navigation rules.
-So the system will:
-- not navigate anywhere,
-- but it can still speak a chatbot reply.
-
-#### C) Voice inputs that trigger **both navigation and spoken output** (Both)
-For common commands like crop/fertilizer/weather (and most disease-related phrases), the system effectively does both:
-- frontend acknowledgement + navigation
-- backend chatbot reply (because the transcript is also sent to `/chat`)
+#### B) Voice inputs that trigger **spoken output + navigation** (Frontend)
+In this repo, the supported voice commands are those that map to a page intent.
+The Assistant speaks an acknowledgement and navigates.
 
 #### D) Unsupported / unknown voice inputs
 If nothing matches:
@@ -165,10 +150,7 @@ If nothing matches:
 The table below covers the **complete set of supported keyword variants** currently implemented in code.
 
 Notes:
-- **Handled by** means where the keyword is implemented:
-  - *Frontend* = navigation intent matching (`useVoiceCommands.js`)
-  - *Backend* = chatbot intent matching (`chatbotService.js`)
-  - *Both* = exists in both places
+- **Handled by**: Frontend intent matching (`useVoiceCommands.js`)
 - **System behavior** can include:
   - *Navigate* (page redirection)
   - *Speak* (Text-to-Speech)
@@ -176,15 +158,11 @@ Notes:
 
 | Spoken keyword / phrase (examples) | Detected intent | Handled by | System behavior | Route (if navigate) | Example spoken output |
 |---|---|---|---|---|---|
-| **English**: `crop`, `recommend`  \\ **Punjabi**: `ਫਸਲ`, `ਸਿਫ਼ਾਰ` | `crop` | **Both** | **Speak + Navigate + Speak** (ack + go to page + chatbot reply) | `/crop` | “Heard: crop recommendation. Get crop recommendation.” (then chatbot: “For crop recommendation, please save your Farmer Profile…”) |
-| **English**: `fertilizer`, `fertil`, `urea`, `npk`  \\ **Punjabi**: `ਖਾਦ`, `ਯੂਰੀਆ`, `ਐਨਪੀਕੇ`, `npk` | `fertilizer` | **Both** | **Speak + Navigate + Speak** | `/fertilizer` | “Heard: fertilizer… Fertilizer guidance.” (then chatbot gives guidance instructions) |
-| **English**: `disease`, `leaf`  \\ **Punjabi**: `ਬਿਮਾਰੀ`, `ਪੱਤਾ` | `disease` | **Both** | **Speak + Navigate + Speak** (ack + go to page + chatbot reply) | `/disease` | “Heard: disease… Detect disease from image.” (then chatbot: “For disease detection, upload a leaf image…”) |
-| **English**: `image`  \\ **Punjabi**: `ਤਸਵੀਰ` | `disease` | **Frontend only** | **Speak + Navigate** (ack + go to page) | `/disease` | “Heard: image… Detect disease from image.” *(backend chatbot may reply “unknown” if no other keyword is present)* |
-| **English**: `weather`, `rain`, `forecast`  \\ **Punjabi**: `ਮੌਸਮ`, `ਬਰਸਾਤ`, `ਭਵਿੱਖ` | `weather` | **Both** | **Speak + Navigate + Speak** | `/weather` | “Heard: weather… View weather forecast.” |
-| **English**: `help`, `hi`, `hello`  \\ **Punjabi**: `ਮਦਦ`, `ਨਮਸਤੇ`, `ਸਤ` | `help` | **Backend only** | **Speak only** (chatbot reply) | — | “I can help with: crop recommendation, fertilizer guidance…” |
-| **English**: `which crop`  \\ **Punjabi**: `ਕਿਹੜੀ ਫਸਲ` | `crop` | **Backend only** | **Speak only** (chatbot reply) | — | “For crop recommendation, please save your Farmer Profile and Soil Test…” |
-| **English**: `spot`, `rust`  \\ **Punjabi**: `ਦਾਗ`, `ਰਸਟ` | `disease` | **Backend only** | **Speak only** (chatbot reply) | — | “For disease detection, upload a leaf image…” |
-| Anything else (example: “tell me market price”) | `unknown` | **Backend** (and Frontend fallback) | **No navigation + fallback speech** | — | Frontend: “I couldn’t understand…” + Backend: “Sorry, I couldn’t understand. Try: crop / fertilizer / …” |
+| **English**: `crop`, `recommend`  \\ **Punjabi**: `ਫਸਲ`, `ਸਿਫ਼ਾਰ` | `crop` | Frontend | **Speak + Navigate** | `/crop` | “Heard: crop recommendation. Crop recommendation.” |
+| **English**: `fertilizer`, `fertil`, `urea`, `npk`  \\ **Punjabi**: `ਖਾਦ`, `ਯੂਰੀਆ`, `ਐਨਪੀਕੇ`, `npk` | `fertilizer` | Frontend | **Speak + Navigate** | `/fertilizer` | “Heard: fertilizer… Fertilizer guidance.” |
+| **English**: `disease`, `leaf`, `image`  \\ **Punjabi**: `ਬਿਮਾਰੀ`, `ਪੱਤਾ`, `ਤਸਵੀਰ` | `disease` | Frontend | **Speak + Navigate** | `/disease` | “Heard: disease… Disease detection.” |
+| **English**: `weather`, `rain`, `forecast`  \\ **Punjabi**: `ਮੌਸਮ`, `ਬਰਸਾਤ`, `ਭਵਿੱਖ` | `weather` | Frontend | **Speak + Navigate** | `/weather` | “Heard: weather… Weather forecast.” |
+| Anything else (example: “tell me market price”) | *(no match)* | Frontend | **Fallback speech only** | — | “I couldn’t understand. Try crop / fertilizer / disease / weather.” |
 
 ---
 
@@ -193,8 +171,6 @@ Notes:
 When the transcript does not match supported keywords:
 1) **Frontend** does not navigate anywhere.
 2) The Assistant page speaks a generic message like **“I couldn’t understand…”**.
-3) The transcript is still sent to the backend `/chat` endpoint.
-4) The backend returns an **unknown** template reply, which is also spoken.
 
 Also important:
 - There is **no data persistence** for these voice inputs.
@@ -234,7 +210,7 @@ synth.speak(utter);
 
 So output can be:
 - **Screen**: shows last transcript
-- **Audio**: speaks acknowledgement + chatbot reply
+- **Audio**: speaks acknowledgement (or fallback message)
 
 ---
 
@@ -245,9 +221,7 @@ So output can be:
 4. User speaks.
 5. Browser converts speech → transcript text.
 6. Frontend checks for navigation keywords and may navigate.
-7. In parallel, transcript is sent to backend `/chat`.
-8. Backend returns a rule-based reply.
-9. Frontend speaks the acknowledgement and/or chatbot reply.
+7. Frontend speaks the acknowledgement and navigates to the matched page.
 
 ---
 
@@ -257,17 +231,15 @@ So output can be:
 **Input (English)**: “crop recommendation”
 - Transcript: `crop recommendation`
 - Frontend intent: `crop` → navigates to `/crop`
-- Backend intent: `crop` → chatbot reply about saving Profile + Soil Test
 
-### Example 2: Spoken answer only (no navigation)
+### Example 2: Unsupported input (no navigation)
 **Input (English)**: “help”
 - Frontend intent: *(no match)* → no navigation
-- Backend intent: `help` → speaks what the bot supports
+- Assistant speaks fallback (e.g., “Try crop/fertilizer/disease/weather”)
 
 ### Example 3: Unknown input
 **Input**: “tell me tomorrow market price”
 - Frontend intent: *(no match)*
-- Backend intent: `unknown`
 - Spoken fallback: “Sorry, I couldn’t understand…”
 
 ---
@@ -290,11 +262,9 @@ So output can be:
 ### Not a full “voice form filling” bot
 - Current voice feature is mainly for:
   - guided commands (navigation)
-  - sending transcript to chatbot
 - It **does not** automatically fill numeric soil input fields (N, P, K, pH) from speech.
 
 ### Not a smart conversational AI
-- Backend chatbot is rule-based and template-based.
 - There is **no LLM integration**.
 - Complex free-form conversations will not be handled well.
 
@@ -311,13 +281,9 @@ So output can be:
 
 ### Frontend
 - Voice capture + STT + intent: `frontend/src/voice/useVoiceCommands.js`
-- Voice UI + TTS + navigation + chat call: `frontend/src/pages/AssistantPage.jsx`
-
-### Backend
-- Chat endpoint: `backend/src/routes/chatRoutes.js`
-- Rule-based chatbot: `backend/src/services/chatbotService.js`
+- Voice UI + TTS + navigation: `frontend/src/pages/AssistantPage.jsx`
 
 ---
 
 ## One-line viva-ready summary
-The voice bot uses browser Speech Recognition to convert speech to text, then applies rule-based keyword matching for navigation and a rule-based backend chatbot for short replies, and finally speaks the response with browser Text-to-Speech—only predefined commands are supported, and everything else falls into an unknown/fallback case by design.
+The voice bot uses browser Speech Recognition to convert speech to text, then applies rule-based keyword matching for navigation and can also call a rule-based backend chatbot for a short reply, and finally speaks the response with browser Text-to-Speech—only predefined commands are supported, and everything else falls into an unknown/fallback case by design.

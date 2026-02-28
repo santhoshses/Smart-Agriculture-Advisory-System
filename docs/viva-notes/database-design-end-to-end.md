@@ -462,7 +462,7 @@ What may become a growth point:
 
 Not implemented (but important for real scale):
 - Recommendation history table (not stored today)
-- Voice/chat logs table (not stored today)
+- Voice interaction logs table (not stored today)
 - Audit logs (not stored today)
 
 ---
@@ -484,7 +484,7 @@ Not implemented (but important for real scale):
 - MongoDB doesn’t enforce foreign keys; routes do manual checks.
 - If someone writes directly to DB, references could become invalid.
 
-5) **Voice/chat not persisted**
+5) **Voice interactions not persisted**
 - No history, no troubleshooting logs, no audit trail.
 
 6) **Some legacy fields exist**

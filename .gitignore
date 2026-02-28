@@ -1,3 +1,21 @@
 # ML models (do not commit)
 ml-service/models/
 
+# Node dependencies
+node_modules/
+
+# Python virtual environments / caches
+.venv/
+ml-service/.venv/
+**/__pycache__/
+*.pyc
+
+# Local test assets (do not commit)
+ml-service/_test_leaf.png
+
+# Local sample images folder (not needed for source; keep repo clean)
+test-images/
+
+
+
+
