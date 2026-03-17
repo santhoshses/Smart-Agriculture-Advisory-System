@@ -278,10 +278,7 @@ export default function ProfilePage() {
             </NavLink>
           </div>
 
-          <details style={{ marginTop: 12 }}>
-            <summary>Raw JSON</summary>
-            <pre className="preWrap">{JSON.stringify(saved, null, 2)}</pre>
-          </details>
+          {null}
         </div>
       ) : null}
     </div>

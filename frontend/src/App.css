@@ -12,8 +12,10 @@
   gap: 16px;
   padding: 14px var(--container-pad);
   border-bottom: 1px solid rgba(224, 224, 224, 0.9);
-  background: rgba(255, 255, 255, 0.72);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.80), rgba(255, 255, 255, 0.62));
   backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
 .brandTitle {
@@ -21,7 +23,7 @@
 }
 
 .headerActions .btn:not(.btnPrimary) {
-  background: rgba(255, 255, 255, 0.9);
+  /* Keep header language toggle aligned with global filled button style */
 }
 
 .brandTitle {
@@ -45,7 +47,8 @@
 .sidebar {
   padding: 14px;
   border-right: 1px solid rgba(224, 224, 224, 0.9);
-  background: rgba(255, 255, 255, 0.62);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.56));
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
@@ -57,11 +60,14 @@
   border-radius: 12px;
   color: var(--text);
   text-decoration: none;
-  transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+  position: relative;
+  transition: background var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out), border-color var(--dur-2) var(--ease-out);
 }
 
 .sidebar a:hover {
   background: rgba(46, 125, 50, 0.08);
+  transform: translateY(-0.5px);
 }
 
 .sidebar a.active {
@@ -82,59 +88,141 @@
 }
 
 .btn {
-  border: 1px solid rgba(224, 224, 224, 0.95);
-  background: var(--surface);
-  color: var(--text);
-  padding: 10px 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: var(--shadow-xs);
-  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease,
-    border-color 220ms ease;
-}
-
-.btnPrimary {
+  border: 1px solid rgba(46, 125, 50, 0.38);
   background: linear-gradient(180deg, rgba(76, 175, 80, 0.98), rgba(46, 125, 50, 0.98));
   color: #fff;
-  border-color: rgba(46, 125, 50, 0.55);
+  padding: 11px 14px;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.25),
+    0 14px 34px rgba(46, 125, 50, 0.20);
+  transform: translateY(0);
+  transition: transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out),
+    filter var(--dur-2) var(--ease-out), background var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.55), transparent 45%, transparent 55%, rgba(255, 255, 255, 0.20));
+  opacity: 0.0;
+  transition: opacity var(--dur-2) var(--ease-out);
+  pointer-events: none;
+}
+
+/* Optional stronger CTA variant */
+.btnPrimary {
+  background: linear-gradient(180deg, rgba(255, 193, 7, 0.98), rgba(245, 158, 11, 0.98));
+  border-color: rgba(245, 158, 11, 0.50);
+  color: rgba(15, 23, 42, 0.92);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.45),
+    0 16px 40px rgba(245, 158, 11, 0.22);
 }
 
 .btnPrimary:hover {
-  box-shadow: 0 14px 34px rgba(46, 125, 50, 0.22);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.45),
+    0 20px 52px rgba(245, 158, 11, 0.28);
 }
 
 .btnPrimary:focus {
-  box-shadow: 0 14px 34px rgba(46, 125, 50, 0.22), var(--ring);
+  box-shadow:
+    0 20px 52px rgba(245, 158, 11, 0.28),
+    0 0 0 4px rgba(255, 193, 7, 0.22);
 }
 
 .btn:hover {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.25),
+    0 20px 52px rgba(46, 125, 50, 0.26);
+}
+
+.btn:hover::before {
+  opacity: 0.35;
 }
 
 .btn:active {
-  transform: translateY(0px);
+  transform: translateY(0px) scale(0.99);
+  filter: saturate(1.02) contrast(1.02);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.22),
+    0 12px 28px rgba(46, 125, 50, 0.18);
 }
 
 .btn:focus {
   outline: none;
-  box-shadow: var(--shadow-sm), var(--ring);
+  box-shadow: 0 20px 52px rgba(46, 125, 50, 0.26), var(--ring);
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.55;
   cursor: not-allowed;
   transform: none;
+  filter: none;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.2),
+    0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+/* Button size + layout helpers */
+.btnLg {
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.btnBlock {
+  width: 100%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btnBlock + .btnBlock {
+  margin-top: 10px;
+}
+
+/* Disease page: make file + CTA feel intentional and spacious */
+.diseaseCard input[type="file"] {
+  padding: 12px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.82));
+}
+
+.diseaseCard input[type="file"]::-webkit-file-upload-button {
+  border: 1px solid rgba(46, 125, 50, 0.38);
+  background: linear-gradient(180deg, rgba(76, 175, 80, 0.98), rgba(46, 125, 50, 0.98));
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.diseaseCard .btnBlock {
+  margin-top: 12px;
 }
 
 .card {
   margin-top: 12px;
   border: 1px solid rgba(224, 224, 224, 0.95);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   padding: 16px;
-  background: var(--surface-tint);
-  box-shadow: var(--shadow-xs);
-  transition: transform 240ms ease, box-shadow 240ms ease, border-color 240ms ease;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 16px 38px rgba(15, 23, 42, 0.10);
+  transition: transform var(--dur-3) var(--ease-out), box-shadow var(--dur-3) var(--ease-out),
+    border-color var(--dur-3) var(--ease-out);
 }
 
 /* Clean details/summary */
@@ -189,7 +277,9 @@ tr:hover td {
 
 .card:hover {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 22px 54px rgba(15, 23, 42, 0.14);
 }
 
 .muted {
@@ -212,13 +302,15 @@ tr:hover td {
 .hero {
   position: relative;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 22px;
   padding: 18px;
   background:
     radial-gradient(1200px 500px at 10% -10%, rgba(76, 175, 80, 0.18), transparent 60%),
     radial-gradient(900px 420px at 110% 10%, rgba(255, 193, 7, 0.16), transparent 55%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86));
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 22px 60px rgba(15, 23, 42, 0.12);
   overflow: hidden;
   animation: fadeUp 220ms ease-out both;
 }
@@ -248,8 +340,8 @@ tr:hover td {
   gap: 8px;
   padding: 8px 10px;
   border-radius: 999px;
-  background: rgba(255, 193, 7, 0.16);
-  border: 1px solid rgba(255, 193, 7, 0.26);
+  background: rgba(255, 193, 7, 0.18);
+  border: 1px solid rgba(255, 193, 7, 0.30);
   font-size: 13px;
 }
 
@@ -270,13 +362,17 @@ tr:hover td {
   border: 1px solid var(--border);
   border-radius: 16px;
   padding: 12px;
-  box-shadow: var(--shadow-xs);
-  transition: transform 160ms ease, box-shadow 160ms ease;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 12px 28px rgba(15, 23, 42, 0.10);
+  transition: transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
 }
 
 .flowStep:hover {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 18px 46px rgba(15, 23, 42, 0.14);
 }
 
 .flowNum {
@@ -316,14 +412,18 @@ tr:hover td {
   border-radius: 16px;
   border: 1px solid var(--border);
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: var(--shadow-xs);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 14px 34px rgba(15, 23, 42, 0.10);
   text-decoration: none;
-  transition: transform 160ms ease, box-shadow 160ms ease;
+  transition: transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
 }
 
 .actionCard:hover {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 20px 52px rgba(15, 23, 42, 0.14);
 }
 
 .actionTop {
@@ -357,7 +457,8 @@ tr:hover td {
   padding: 6px 10px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
   font-size: 12px;
   color: var(--text);
 }
@@ -414,17 +515,28 @@ tr:hover td {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid rgba(46, 125, 50, 0.22);
-  background: rgba(76, 175, 80, 0.12);
+  border: 1px solid rgba(46, 125, 50, 0.26);
+  background: linear-gradient(180deg, rgba(76, 175, 80, 0.14), rgba(76, 175, 80, 0.10));
   text-decoration: none;
   color: var(--green-700);
   font-weight: 700;
-  transition: transform 160ms ease, box-shadow 160ms ease;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85),
+    0 12px 28px rgba(15, 23, 42, 0.10);
+  transition: transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out),
+    filter var(--dur-2) var(--ease-out);
 }
 
 .ctaLink:hover {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85),
+    0 18px 46px rgba(15, 23, 42, 0.14);
+}
+
+.ctaLink:active {
+  transform: translateY(0) scale(0.99);
+  filter: saturate(1.02) contrast(1.02);
 }
 
 /* Weather visuals (Step 4) */
@@ -439,13 +551,17 @@ tr:hover td {
   border-radius: 16px;
   padding: 12px;
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: var(--shadow-xs);
-  transition: transform 160ms ease, box-shadow 160ms ease;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 12px 28px rgba(15, 23, 42, 0.10);
+  transition: transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
 }
 
 .forecastCard:hover {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 18px 46px rgba(15, 23, 42, 0.14);
 }
 
 .forecastTop {
@@ -490,7 +606,9 @@ tr:hover td {
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.88);
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 16px 38px rgba(15, 23, 42, 0.12);
 }
 
 .imagePreview img {
@@ -530,7 +648,11 @@ tr:hover td {
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.80);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.78));
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 16px 38px rgba(15, 23, 42, 0.10);
 }
 
 .bubbleRow {
@@ -542,7 +664,9 @@ tr:hover td {
   padding: 10px 12px;
   border-radius: 16px;
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.85),
+    0 10px 24px rgba(15, 23, 42, 0.10);
   animation: fadeUp 180ms ease-out both;
 }
 

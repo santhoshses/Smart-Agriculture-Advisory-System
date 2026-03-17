@@ -306,12 +306,7 @@ export default function WeatherPage() {
             </details>
           </div>
 
-          <div className="card">
-            <details>
-              <summary>{t("commonRawJson")}</summary>
-              <pre className="preWrap">{JSON.stringify(result, null, 2)}</pre>
-            </details>
-          </div>
+          {null}
         </>
       ) : null}
     </div>

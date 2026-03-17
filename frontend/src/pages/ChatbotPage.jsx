@@ -88,10 +88,7 @@ export default function ChatbotPage() {
             </div>
           </div>
 
-          <details className="mt10">
-            <summary>{t("commonRawJson")}</summary>
-            <pre className="preWrap">{JSON.stringify(reply, null, 2)}</pre>
-          </details>
+          {null}
         </div>
       ) : null}
     </div>

@@ -57,7 +57,7 @@ export default function DiseaseDetectionPage() {
       <h1>{t("pageDiseaseTitle")}</h1>
       <p>{t("pageDiseaseBody")}</p>
 
-      <div className="card">
+      <div className="card diseaseCard">
         <label htmlFor="leafImage">
           <strong>{t("pageDiseaseLeafImage")}</strong>
         </label>
@@ -99,7 +99,7 @@ export default function DiseaseDetectionPage() {
           </div>
         ) : null}
 
-        <button className="btn" type="button" onClick={onPredict} disabled={loading}>
+        <button className="btn btnLg btnBlock" type="button" onClick={onPredict} disabled={loading}>
           {loading ? t("diseaseUploading") : t("diseasePredict")}
         </button>
 
@@ -107,12 +107,7 @@ export default function DiseaseDetectionPage() {
           <div className="mt10">
             <strong>{t("diseaseError")}</strong>
             <div className="muted">{String(error.message || error)}</div>
-            {error.data ? (
-              <details className="mt10">
-                <summary>{t("commonRawJson")}</summary>
-                <pre className="preWrap">{JSON.stringify(error.data, null, 2)}</pre>
-              </details>
-            ) : null}
+            {null}
           </div>
         ) : null}
       </div>
@@ -164,10 +159,7 @@ export default function DiseaseDetectionPage() {
             </div>
           ) : null}
 
-          <details style={{ marginTop: 12 }}>
-            <summary>{t("commonRawJson")}</summary>
-            <pre className="preWrap">{JSON.stringify(result, null, 2)}</pre>
-          </details>
+          {null}
         </div>
       ) : null}
     </div>

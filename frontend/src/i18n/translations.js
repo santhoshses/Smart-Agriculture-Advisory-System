@@ -1,7 +1,7 @@
 export const translations = {
   en: {
     appTitle: "Smart Crop Advisory",
-    appSubtitle: "Review-01 UI Skeleton",
+    appSubtitle: "Bilingual Crop Advisory",
     languageLabel: "Language",
     languageEnglish: "English",
     languagePunjabi: "Punjabi",
@@ -61,7 +61,7 @@ export const translations = {
 
     commonNext: "Next",
     commonView: "View",
-    commonRawJson: "Raw JSON",
+    // commonRawJson removed (debug UI removed for production)
     commonOptionalNone: "(Optional) None",
 
     cropWeatherUsed: "Weather used",
@@ -71,14 +71,7 @@ export const translations = {
     cropScore: "Score",
     cropNone: "No recommendations available.",
 
-    edgeStatusTitle: "Edge status (Review-01)",
-    edgeStatusBody:
-      "This explains what can run locally at the edge (offline/near-farm) vs what still needs internet.",
-    edgeStatusLoading: "Loading edge status...",
-    edgeStatusError: "Could not load edge status",
-    edgeMlReachable: "ML service reachable",
-    edgeMlUnreachable: "ML service NOT reachable",
-    edgeShowDetails: "Show details",
+    // (Edge status strings removed for production cleanup)
 
     pageProfileTitle: "Farmer Profile",
     pageProfileBody: "Enter your details and save.",
@@ -218,7 +211,7 @@ export const translations = {
   // Punjabi (Gurmukhi) — basic demo translations
   pa: {
     appTitle: "ਸਮਾਰਟ ਫਸਲ ਸਲਾਹਕਾਰ",
-    appSubtitle: "ਰਿਵਿਊ-01 UI ਸਕੈਲਟਨ",
+    appSubtitle: "ਦੋਭਾਸ਼ੀ ਫਸਲ ਸਲਾਹਕਾਰ",
     languageLabel: "ਭਾਸ਼ਾ",
     languageEnglish: "ਅੰਗ੍ਰੇਜ਼ੀ",
     languagePunjabi: "ਪੰਜਾਬੀ",
@@ -278,7 +271,7 @@ export const translations = {
 
     commonNext: "ਅਗਲਾ",
     commonView: "ਵੇਖੋ",
-    commonRawJson: "ਕੱਚਾ JSON",
+    // commonRawJson removed (ਡਿਬੱਗ UI ਹਟਾਇਆ ਗਿਆ)
     commonOptionalNone: "(ਚੋਣਵਾਂ) ਨਹੀਂ",
 
     cropWeatherUsed: "ਵਰਤਿਆ ਗਿਆ ਮੌਸਮ",
@@ -288,14 +281,7 @@ export const translations = {
     cropScore: "ਸਕੋਰ",
     cropNone: "ਕੋਈ ਸਿਫ਼ਾਰਿਸ਼ ਉਪਲਬਧ ਨਹੀਂ।",
 
-    edgeStatusTitle: "ਐਜ ਸਥਿਤੀ (ਰਿਵਿਊ-01)",
-    edgeStatusBody:
-      "ਇਹ ਦਿਖਾਉਂਦਾ ਹੈ ਕਿ ਕੀ ਕੁਝ ਐਜ (ਖੇਤ ਦੇ ਨੇੜੇ/ਆਫਲਾਈਨ) ਚੱਲ ਸਕਦਾ ਹੈ ਅਤੇ ਕੀ ਕੁਝ ਲਈ ਇੰਟਰਨੈੱਟ ਚਾਹੀਦਾ ਹੈ।",
-    edgeStatusLoading: "ਐਜ ਸਥਿਤੀ ਲੋਡ ਹੋ ਰਹੀ ਹੈ...",
-    edgeStatusError: "ਐਜ ਸਥਿਤੀ ਲੋਡ ਨਹੀਂ ਹੋਈ",
-    edgeMlReachable: "ML ਸਰਵਿਸ ਉਪਲਬਧ ਹੈ",
-    edgeMlUnreachable: "ML ਸਰਵਿਸ ਉਪਲਬਧ ਨਹੀਂ ਹੈ",
-    edgeShowDetails: "ਵੇਰਵਾ ਵੇਖੋ",
+    // (ਐਜ ਸਥਿਤੀ ਵਾਲੀਆਂ ਲਾਈਨਾਂ ਪ੍ਰੋਡਕਸ਼ਨ ਕਲੀਨਅੱਪ ਲਈ ਹਟਾਈਆਂ ਗਈਆਂ ਹਨ)
 
     pageProfileTitle: "ਕਿਸਾਨ ਪ੍ਰੋਫ਼ਾਈਲ",
     pageProfileBody: "ਆਪਣੀ ਜਾਣਕਾਰੀ ਭਰੋ ਅਤੇ ਸੇਵ ਕਰੋ।",

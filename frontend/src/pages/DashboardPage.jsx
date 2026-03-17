@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useI18n } from "../i18n/I18nContext";
-import { apiRequest } from "../api/client";
 import { NavLink } from "react-router-dom";
 
 function Icon({ name }) {
@@ -93,33 +92,6 @@ function Icon({ name }) {
 export default function DashboardPage() {
   const { t } = useI18n();
 
-  const [edge, setEdge] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    let alive = true;
-    setLoading(true);
-    setError(null);
-    apiRequest("/edge/status")
-      .then((data) => {
-        if (!alive) return;
-        setEdge(data);
-      })
-      .catch((e) => {
-        if (!alive) return;
-        setError(e);
-      })
-      .finally(() => {
-        if (!alive) return;
-        setLoading(false);
-      });
-
-    return () => {
-      alive = false;
-    };
-  }, []);
-
   const quick = useMemo(
     () => [
       { to: "/profile", icon: "profile", title: t("dashActionProfile"), desc: t("dashFlow1Body") },
@@ -194,37 +166,6 @@ export default function DashboardPage() {
             </NavLink>
           ))}
         </div>
-      </div>
-
-      <div className="card">
-        <h2 className="sectionTitle">{t("edgeStatusTitle")}</h2>
-        <p className="muted">{t("edgeStatusBody")}</p>
-
-        {loading ? <div className="muted">{t("edgeStatusLoading")}</div> : null}
-
-        {error ? (
-          <div>
-            <strong>{t("edgeStatusError")}</strong>
-            <div className="muted">{String(error.message || error)}</div>
-          </div>
-        ) : null}
-
-        {edge ? (
-          <>
-            <div className="mt10">
-              {edge?.services?.mlService?.reachable ? (
-                <div><strong>{t("edgeMlReachable")}</strong></div>
-              ) : (
-                <div><strong>{t("edgeMlUnreachable")}</strong></div>
-              )}
-            </div>
-
-            <details className="mt10">
-              <summary>{t("edgeShowDetails")}</summary>
-              <pre className="preWrap">{JSON.stringify(edge, null, 2)}</pre>
-            </details>
-          </>
-        ) : null}
       </div>
     </div>
   );

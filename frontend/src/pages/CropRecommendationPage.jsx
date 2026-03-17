@@ -162,10 +162,7 @@ export default function CropRecommendationPage() {
           </NavLink>
         </div>
 
-        <details style={{ marginTop: 12 }}>
-          <summary>{t("commonRawJson")}</summary>
-          <pre className="preWrap">{JSON.stringify(result, null, 2)}</pre>
-        </details>
+        {null}
       </div>
     );
   };
