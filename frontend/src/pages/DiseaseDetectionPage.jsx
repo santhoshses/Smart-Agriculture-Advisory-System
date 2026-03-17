@@ -79,7 +79,7 @@ export default function DiseaseDetectionPage() {
           <div className="imagePreview">
             <img src={previewUrl} alt={t("pageDiseaseLeafImage")} />
             <div className="imagePreviewMeta">
-              <div style={{ minWidth: 0 }}>
+              <div className="minW0">
                 <div className="muted" style={{ fontSize: 12 }}>
                   {t("diseaseChosenFile")}
                 </div>
@@ -104,13 +104,13 @@ export default function DiseaseDetectionPage() {
         </button>
 
         {error ? (
-          <div style={{ marginTop: 10 }}>
+          <div className="mt10">
             <strong>{t("diseaseError")}</strong>
             <div className="muted">{String(error.message || error)}</div>
             {error.data ? (
-              <details style={{ marginTop: 10 }}>
+              <details className="mt10">
                 <summary>{t("commonRawJson")}</summary>
-                <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(error.data, null, 2)}</pre>
+                <pre className="preWrap">{JSON.stringify(error.data, null, 2)}</pre>
               </details>
             ) : null}
           </div>
@@ -130,7 +130,7 @@ export default function DiseaseDetectionPage() {
               <p className="kvLabel">{t("diseaseConfidence")}</p>
               <p className="kvValue">{confidencePct !== null ? `${confidencePct}%` : "-"}</p>
               {confidencePct !== null ? (
-                <div style={{ marginTop: 8 }}>
+                <div className="mt8">
                   <div className="progressBar" aria-hidden>
                     <div className="progressFill" style={{ width: `${confidencePct}%` }} />
                   </div>
@@ -140,7 +140,7 @@ export default function DiseaseDetectionPage() {
           </div>
 
           {result.recommendation ? (
-            <div className="kv" style={{ marginTop: 12 }}>
+            <div className="kv mt12">
               <div className="flowLabel">{t("diseaseTreatmentTitle")}</div>
               <ul style={{ margin: "10px 0 0", paddingLeft: 18 }}>
                 <li>
@@ -166,7 +166,7 @@ export default function DiseaseDetectionPage() {
 
           <details style={{ marginTop: 12 }}>
             <summary>{t("commonRawJson")}</summary>
-            <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(result, null, 2)}</pre>
+            <pre className="preWrap">{JSON.stringify(result, null, 2)}</pre>
           </details>
         </div>
       ) : null}

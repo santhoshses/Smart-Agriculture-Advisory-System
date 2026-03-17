@@ -144,7 +144,7 @@ export default function DashboardPage() {
           <span className="pill pillGreen">{t("dashPillEdge")}</span>
         </div>
 
-        <h2 style={{ marginTop: 16 }}>{t("dashFlowTitle")}</h2>
+        <h2 className="mt16">{t("dashFlowTitle")}</h2>
         <div className="flow">
           <div className="flowStep">
             <div className="flowNum">1</div>
@@ -183,7 +183,7 @@ export default function DashboardPage() {
                 <span className="iconBox" aria-hidden>
                   <Icon name={q.icon} />
                 </span>
-                <div style={{ minWidth: 0 }}>
+                <div className="minW0">
                   <div className="actionTitle">{q.title}</div>
                   <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>
                     {t("dashActionGo")}
@@ -211,7 +211,7 @@ export default function DashboardPage() {
 
         {edge ? (
           <>
-            <div style={{ marginTop: 10 }}>
+            <div className="mt10">
               {edge?.services?.mlService?.reachable ? (
                 <div><strong>{t("edgeMlReachable")}</strong></div>
               ) : (
@@ -219,9 +219,9 @@ export default function DashboardPage() {
               )}
             </div>
 
-            <details style={{ marginTop: 10 }}>
+            <details className="mt10">
               <summary>{t("edgeShowDetails")}</summary>
-              <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(edge, null, 2)}</pre>
+              <pre className="preWrap">{JSON.stringify(edge, null, 2)}</pre>
             </details>
           </>
         ) : null}

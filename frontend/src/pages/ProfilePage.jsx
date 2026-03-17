@@ -156,7 +156,7 @@ export default function ProfilePage() {
       ) : null}
 
       <form className="card" onSubmit={onSubmit}>
-        <div style={{ display: "grid", gap: 10 }}>
+        <div className="stack10">
           <label>
             <div><strong>{t("profileName")}</strong></div>
             <input name="name" value={form.name} onChange={onChange} />
@@ -280,7 +280,7 @@ export default function ProfilePage() {
 
           <details style={{ marginTop: 12 }}>
             <summary>Raw JSON</summary>
-            <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(saved, null, 2)}</pre>
+            <pre className="preWrap">{JSON.stringify(saved, null, 2)}</pre>
           </details>
         </div>
       ) : null}

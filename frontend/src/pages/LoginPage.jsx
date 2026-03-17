@@ -67,7 +67,7 @@ export default function LoginPage() {
       ) : null}
 
       <form className="card" onSubmit={onLogin}>
-        <div style={{ display: "grid", gap: 10 }}>
+        <div className="stack10">
           <label>
             <div><strong>{t("loginSelectFarmer")}</strong></div>
             <select
@@ -92,4 +92,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
 

@@ -120,7 +120,7 @@ export default function CropRecommendationPage() {
     return (
       <div className="card">
         <h2 className="sectionTitle">{t("cropResult")}</h2>
-        <div style={{ display: "grid", gap: 10 }}>
+        <div className="stack10">
           {items.map((r, idx) => (
             <div key={`${r.crop}-${idx}`} className="kv" style={{ padding: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
@@ -164,7 +164,7 @@ export default function CropRecommendationPage() {
 
         <details style={{ marginTop: 12 }}>
           <summary>{t("commonRawJson")}</summary>
-          <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(result, null, 2)}</pre>
+          <pre className="preWrap">{JSON.stringify(result, null, 2)}</pre>
         </details>
       </div>
     );
@@ -185,7 +185,7 @@ export default function CropRecommendationPage() {
       {!loadingProfile && !profile ? (
         <div className="card">
           <div className="muted">{t("cropNoProfiles")}</div>
-          <div className="ctaRow" style={{ marginTop: 10 }}>
+          <div className="ctaRow mt10">
             <NavLink className="ctaLink" to="/profile">
               {t("commonGoToProfile")}
             </NavLink>
@@ -201,7 +201,7 @@ export default function CropRecommendationPage() {
       ) : null}
 
       <div className="card">
-        <div style={{ display: "grid", gap: 10 }}>
+        <div className="stack10">
           <div className="chips">
             <span className="chip">
               {t("cropSelectProfile")}: {profile?.name || profile?.locationId?.name?.en || "-"}
@@ -246,7 +246,7 @@ export default function CropRecommendationPage() {
           <strong>{t("cropErrorFetch")}</strong>
           <div className="muted">{String(error.message || error)}</div>
           {error.data ? (
-            <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(error.data, null, 2)}</pre>
+            <pre className="preWrap">{JSON.stringify(error.data, null, 2)}</pre>
           ) : null}
         </div>
       ) : null}

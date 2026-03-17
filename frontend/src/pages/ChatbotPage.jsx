@@ -43,7 +43,7 @@ export default function ChatbotPage() {
       <p className="muted">{t("pageChatBody")}</p>
 
       <form className="card" onSubmit={onSend}>
-        <div style={{ display: "grid", gap: 10 }}>
+        <div className="stack10">
           <label>
             <div><strong>{t("chatYourQuestion")}</strong></div>
             <input
@@ -64,7 +64,7 @@ export default function ChatbotPage() {
           <strong>{t("chatError")}</strong>
           <div className="muted">{String(error.message || error)}</div>
           {error.data ? (
-            <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(error.data, null, 2)}</pre>
+            <pre className="preWrap">{JSON.stringify(error.data, null, 2)}</pre>
           ) : null}
         </div>
       ) : null}
@@ -77,20 +77,20 @@ export default function ChatbotPage() {
             <div className="bubbleRow">
               <div className="bubble bubbleUser">
                 <div className="bubbleMeta">{t("chatYou")}</div>
-                <div style={{ whiteSpace: "pre-wrap" }}>{lastQuestion}</div>
+                <div className="preWrap">{lastQuestion}</div>
               </div>
             </div>
             <div className="bubbleRow">
               <div className="bubble bubbleBot">
                 <div className="bubbleMeta">{t("chatBotReply")}</div>
-                <div style={{ whiteSpace: "pre-wrap" }}>{reply.reply}</div>
+                <div className="preWrap">{reply.reply}</div>
               </div>
             </div>
           </div>
 
-          <details style={{ marginTop: 10 }}>
+          <details className="mt10">
             <summary>{t("commonRawJson")}</summary>
-            <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(reply, null, 2)}</pre>
+            <pre className="preWrap">{JSON.stringify(reply, null, 2)}</pre>
           </details>
         </div>
       ) : null}

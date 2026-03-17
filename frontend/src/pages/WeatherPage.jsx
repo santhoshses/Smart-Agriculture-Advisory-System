@@ -152,7 +152,7 @@ export default function WeatherPage() {
       {!loadingProfile && !profile ? (
         <div className="card">
           <div className="muted">{t("weatherNoProfiles")}</div>
-          <div className="ctaRow" style={{ marginTop: 10 }}>
+          <div className="ctaRow mt10">
             <NavLink className="ctaLink" to="/profile">
               {t("commonGoToProfile")}
             </NavLink>
@@ -168,7 +168,7 @@ export default function WeatherPage() {
       ) : null}
 
       <div className="card">
-        <div style={{ display: "grid", gap: 10 }}>
+        <div className="stack10">
           <div className="chips">
             <span className="chip">
               {t("weatherSelectProfile")}: {profile?.name || profile?.locationId?.name?.en || "-"}
@@ -213,7 +213,7 @@ export default function WeatherPage() {
           <strong>{t("weatherError")}</strong>
           <div className="muted">{String(error.message || error)}</div>
           {error.data ? (
-            <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(error.data, null, 2)}</pre>
+            <pre className="preWrap">{JSON.stringify(error.data, null, 2)}</pre>
           ) : null}
         </div>
       ) : null}
@@ -279,7 +279,7 @@ export default function WeatherPage() {
           <div className="card">
             <details>
               <summary>{t("weatherForecast")}</summary>
-              <div style={{ overflowX: "auto", marginTop: 10 }}>
+              <div style={{ overflowX: "auto" }} className="mt10">
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
                     <tr>
@@ -309,7 +309,7 @@ export default function WeatherPage() {
           <div className="card">
             <details>
               <summary>{t("commonRawJson")}</summary>
-              <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(result, null, 2)}</pre>
+              <pre className="preWrap">{JSON.stringify(result, null, 2)}</pre>
             </details>
           </div>
         </>

@@ -1,0 +1,171 @@
+/*
+  Global Theme (UI Facelift)
+  - Visual upgrade only (no layout/flow changes)
+  - Consistent agriculture palette + reusable primitives
+*/
+
+:root {
+  /* Brand palette */
+  --green-700: #2e7d32; /* Primary Green */
+  --green-500: #4caf50; /* Light Green */
+  --yellow-500: #ffc107; /* Accent Yellow */
+  --brown-500: #8d6e63; /* Earth Brown */
+
+  /* Neutrals */
+  --surface: #ffffff;
+  --surface-tint: rgba(255, 255, 255, 0.92);
+  --surface-muted: rgba(255, 255, 255, 0.78);
+  --border: #e0e0e0;
+  --text: #0f172a;
+  --muted: #475569;
+
+  /* Background (soft gradient; light and non-distracting) */
+  --bg-0: #f5fbf6;
+  --bg-1: #f6fbff;
+  --bg: linear-gradient(180deg, var(--bg-0), var(--bg-1));
+
+  /* Semantic */
+  --success: #2e7d32;
+  --warning: #ffc107;
+  --danger: #d32f2f;
+  --info: #1e88e5;
+
+  /* Back-compat tokens (existing classes still reference these) */
+  --primary: var(--green-700);
+  --primary-600: var(--green-700);
+  --primary-50: rgba(76, 175, 80, 0.16);
+
+  /* Effects */
+  --radius: 12px;
+  --radius-sm: 10px;
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-sm: 0 6px 18px rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 14px 40px rgba(15, 23, 42, 0.12);
+  --ring: 0 0 0 4px rgba(46, 125, 50, 0.18);
+
+  --container-pad: 18px;
+
+  /* Typography */
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Reset-ish */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: inherit;
+}
+
+/* Typography hierarchy */
+h1 {
+  font-size: 40px;
+  line-height: 1.08;
+  margin: 0 0 12px;
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  font-size: 20px;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 12px;
+}
+
+/* Form controls */
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(46, 125, 50, 0.65);
+  box-shadow: var(--ring);
+}
+
+/* Make native buttons neutral; use .btn for primary styling */
+button {
+  font: inherit;
+}
+
+/* Small reusable spacing helpers (keeps structure the same) */
+.stack10 {
+  display: grid;
+  gap: 10px;
+}
+
+.mt8 {
+  margin-top: 8px;
+}
+
+.mt10 {
+  margin-top: 10px;
+}
+
+.mt12 {
+  margin-top: 12px;
+}
+
+.mt16 {
+  margin-top: 16px;
+}
+
+.preWrap {
+  white-space: pre-wrap;
+}
+
+.minW0 {
+  min-width: 0;
+}
+
+/* Respect OS preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

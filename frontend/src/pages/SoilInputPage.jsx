@@ -81,7 +81,7 @@ export default function SoilInputPage() {
       {!loadingProfile && !profile ? (
         <div className="card">
           <div className="muted">{t("soilNoProfiles")}</div>
-          <div className="ctaRow" style={{ marginTop: 10 }}>
+          <div className="ctaRow mt10">
             <NavLink className="ctaLink" to="/profile">
               {t("commonGoToProfile")}
             </NavLink>
@@ -90,7 +90,7 @@ export default function SoilInputPage() {
       ) : null}
 
       <form className="card" onSubmit={onSubmit}>
-        <div style={{ display: "grid", gap: 10 }}>
+        <div className="stack10">
           <div className="chips">
             <span className="chip">
               {t("soilSelectProfile")}: {profile?.name || profile?.locationId?.name?.en || "-"}
@@ -164,7 +164,7 @@ export default function SoilInputPage() {
 
           <details style={{ marginTop: 12 }}>
             <summary>Raw JSON</summary>
-            <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(saved, null, 2)}</pre>
+            <pre className="preWrap">{JSON.stringify(saved, null, 2)}</pre>
           </details>
         </div>
       ) : null}
